@@ -197,7 +197,7 @@
     <h3 style="font-family:'Fredoka',sans-serif;font-size:1rem;color:var(--blue);margin-bottom:12px">🎙 长按说话，松开自动翻译朗读</h3>
     <div class="voice-input-area">
       <button class="mic-btn" id="micBtn">🎤</button>
-      <div class="mic-hint">说英文 → 自动翻译成中文并朗读<br>说中文 → 自动翻译成英文并朗读</div>
+      <div class="mic-hint">说英文或中文 → 自动识别翻译朗读</div>
       <div class="mic-status" id="micStatus"></div>
     </div>
     <div id="voiceResult" class="translate-result"></div>
@@ -412,43 +412,48 @@ async function speakAndTranslateLesson(){
   else showResult(el,'英文原文',t,'中文翻译',tr,'en-US','zh-CN','l');
 }
 
-// ===== 语音输入（长按说话）=====
+// ===== 语音输入（自动识别中英文）=====
 var recognition=null;
 var isRecording=false;
 var finalTranscript='';
+var tryingLang='en-US'; // 第一次用英文，没结果自动换中文
 
-function initRecognition(){
+function makeRecognition(lang){
   var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
   if(!SR)return null;
   var r=new SR();
-  r.continuous=true;
+  r.continuous=false;
   r.interimResults=true;
-  // 同时识别英文和中文
-  r.lang='en-US';
+  r.lang=lang;
   return r;
 }
 
 function startRecording(){
   if(isRecording)return;
-  recognition=initRecognition();
-  if(!recognition){
-    var ms=document.getElementById('micStatus');
+  var ms=document.getElementById('micStatus');
+  var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){
     ms.textContent='你的浏览器不支持语音输入，请用Chrome或Safari';
     ms.className='mic-status';return;
   }
-
   isRecording=true;
   finalTranscript='';
+  tryingLang='en-US';
   var micBtn=document.getElementById('micBtn');
-  var ms=document.getElementById('micStatus');
-
   micBtn.classList.add('recording');
   micBtn.textContent='🔴';
   ms.textContent='正在听...请说话';
   ms.className='mic-status listening';
+  tryRecognize('en-US');
+}
+
+function tryRecognize(lang){
+  var ms=document.getElementById('micStatus');
+  recognition=makeRecognition(lang);
+  var interim='';
 
   recognition.onresult=function(e){
-    var interim='';
+    interim='';
     for(var i=e.resultIndex;i<e.results.length;i++){
       if(e.results[i].isFinal){
         finalTranscript+=e.results[i][0].transcript;
@@ -458,33 +463,40 @@ function startRecording(){
     }
     var show=finalTranscript+interim;
     if(show){
-      // 判断听到的是中文还是英文
       var cn=/[\u4e00-\u9fff]/.test(show);
-      if(cn)ms.textContent='听到中文：'+show;
-      else ms.textContent='听到英文：'+show;
+      ms.textContent=(cn?'听到中文：':'听到英文：')+show;
     }
   };
 
   recognition.onerror=function(e){
-    console.log('recognition error:',e.error);
     if(e.error==='not-allowed'){
       ms.textContent='请允许麦克风权限后重试';
-    }else if(e.error==='no-speech'){
-      ms.textContent='没有听到声音，请再试一次';
+      isRecording=false;
+      document.getElementById('micBtn').classList.remove('recording');
+      document.getElementById('micBtn').textContent='🎤';
     }else{
-      ms.textContent='识别出错，请重试';
+      // 出错就直接用已有内容
+      stopRecording(finalTranscript.trim().length>0);
     }
-    stopRecording(false);
   };
 
   recognition.onend=function(){
-    if(isRecording){
-      // 正常结束（松手触发的stop）
+    if(!isRecording)return;
+    if(finalTranscript.trim()){
+      // 有结果了，直接处理
       stopRecording(true);
+    } else if(lang==='en-US'){
+      // 英文没听到，自动换中文再试一次
+      ms.textContent='切换中文模式，再说一遍试试...🇨🇳';
+      tryingLang='zh-CN';
+      try{tryRecognize('zh-CN');}catch(e){stopRecording(false);}
+    } else {
+      // 中文也没听到
+      stopRecording(false);
     }
   };
 
-  try{recognition.start();}catch(e){stopRecording(false)}
+  try{recognition.start();}catch(e){stopRecording(false);}
 }
 
 function stopRecording(shouldProcess){
