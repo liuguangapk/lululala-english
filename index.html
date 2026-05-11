@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MiMo英语小课堂 - 发音工具</title>
+
+<!-- ✅ PWA 必要配置 -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0f0e17">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="MiMo英语">
+
+<!-- ✅ 苹果图标（Safari添加到桌面用） -->
+<link rel="apple-touch-icon" href="icon-192.png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Noto+Sans+SC:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #0f0e17;
+    --card: #1a1929;
+    --accent: #ff8906;
+    --accent2: #e53170;
+    --green: #2cb67d;
+    --text: #fffffe;
+    --muted: #94a1b2;
+    --surface: #232246;
+  }
+
+  body {
+    font-family: 'Noto Sans SC', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 20px;
+    background-image:
+      radial-gradient(ellipse at 10% 20%, rgba(229, 49, 112, 0.08) 0%, transparent 50%),
+      radial-gradient(ellipse at 90% 80%, rgba(255, 137, 6, 0.08) 0%, transparent 50%);
+  }
+
+  .container { max-width: 700px; margin: 0 auto; }
+
+  header {
+    text-align: center;
+    padding: 30px 0 20px;
+  }
+
+  header h1 {
+    font-family: 'Fredoka', sans-serif;
+    font-size: 2rem;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  header p {
+    color: var(--muted);
+    margin-top: 8px;
+    font-size: 0.95rem;
+  }
+
+  /* ✅ 苹果安装提示横幅 */
+  .install-banner {
+    display: none;
+    background: linear-gradient(135deg, rgba(255,137,6,0.15), rgba(229,49,112,0.15));
+    border: 1px solid rgba(255,137,6,0.3);
+    border-radius: 14px;
+    padding: 14px 18px;
+    margin-bottom: 16px;
+    font-size: 0.88rem;
+    color: var(--text);
+    line-height: 1.6;
+    position: relative;
+  }
+  .install-banner.show { display: block; }
+  .install-banner strong { color: var(--accent); }
+  .install-banner .close-btn {
+    position: absolute;
+    top: 10px; right: 14px;
+    background: none; border: none;
+    color: var(--muted); font-size: 1.1rem;
+    cursor: pointer;
+  }
+
+  .input-area {
+    background: var(--card);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 20px;
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .input-area label {
+    display: block;
+    font-size: 0.85rem;
+    color: var(--muted);
+    margin-bottom: 8px;
+    font-weight: 700;
+  }
+
+  .input-row {
+    display: flex;
+    gap: 10px;
+  }
+
+  .input-row input {
+    flex: 1;
+    padding: 14px 18px;
+    border-radius: 12px;
+    border: 2px solid var(--surface);
+    background: var(--bg);
+    color: var(--text);
+    font-size: 1.15rem;
+    font-family: 'Fredoka', sans-serif;
+    outline: none;
+    transition: border-color 0.3s;
+  }
+
+  .input-row input:focus {
+    border-color: var(--accent);
+  }
+
+  .input-row button {
+    padding: 14px 24px;
+    border-radius: 12px;
+    border: none;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: white;
+    font-size: 1.1rem;
+    font-family: 'Fredoka', sans-serif;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.3s;
+    white-space: nowrap;
+  }
+
+  .input-row button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 20px rgba(255, 137, 6, 0.4);
+  }
+
+  .input-row button:active { transform: scale(0.97); }
+
+  .speed-control {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 14px;
+    font-size: 0.85rem;
+    color: var(--muted);
+  }
+
+  .speed-control input[type="range"] {
+    flex: 1;
+    accent-color: var(--accent);
+  }
+
+  .lesson-section {
+    margin-bottom: 24px;
+  }
+
+  .lesson-section h2 {
+    font-family: 'Fredoka', sans-serif;
+    font-size: 1.2rem;
+    color: var(--accent);
+    margin-bottom: 12px;
+    padding-left: 4px;
+  }
+
+  .word-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .word-card {
+    background: var(--surface);
+    border-radius: 12px;
+    padding: 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 2px solid transparent;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .word-card:hover {
+    border-color: var(--accent);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 137, 6, 0.15);
+  }
+
+  .word-card:active { transform: scale(0.97); }
+
+  .word-card .english {
+    font-family: 'Fredoka', sans-serif;
+    font-size: 1.35rem;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+
+  .word-card .phonetic {
+    font-size: 0.8rem;
+    color: var(--accent);
+    margin-bottom: 4px;
+    font-family: 'Fredoka', sans-serif;
+  }
+
+  .word-card .chinese {
+    font-size: 0.85rem;
+    color: var(--muted);
+  }
+
+  .word-card .play-icon {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: rgba(255, 137, 6, 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    color: var(--accent);
+    transition: background 0.2s;
+  }
+
+  .word-card:hover .play-icon {
+    background: rgba(255, 137, 6, 0.3);
+  }
+
+  .sentence-card {
+    background: var(--surface);
+    border-radius: 12px;
+    padding: 18px;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 2px solid transparent;
+    margin-bottom: 10px;
+  }
+
+  .sentence-card:hover {
+    border-color: var(--green);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(44, 182, 125, 0.15);
+  }
+
+  .sentence-card .eng {
+    font-family: 'Fredoka', sans-serif;
+    font-size: 1.15rem;
+    color: var(--text);
+    margin-bottom: 6px;
+    line-height: 1.5;
+  }
+
+  .sentence-card .chn {
+    font-size: 0.85rem;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  .sentence-card .speak-hint {
+    display: inline-block;
+    margin-top: 8px;
+    font-size: 0.75rem;
+    color: var(--green);
+    background: rgba(44, 182, 125, 0.1);
+    padding: 3px 10px;
+    border-radius: 20px;
+  }
+
+  .custom-area {
+    background: var(--card);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 24px;
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .custom-area h3 {
+    font-family: 'Fredoka', sans-serif;
+    font-size: 1rem;
+    color: var(--green);
+    margin-bottom: 12px;
+  }
+
+  .custom-area textarea {
+    width: 100%;
+    padding: 14px;
+    border-radius: 12px;
+    border: 2px solid var(--surface);
+    background: var(--bg);
+    color: var(--text);
+    font-size: 1rem;
+    font-family: 'Fredoka', sans-serif;
+    resize: vertical;
+    min-height: 80px;
+    outline: none;
+    transition: border-color 0.3s;
+  }
+
+  .custom-area textarea:focus { border-color: var(--green); }
+
+  .custom-area button {
+    margin-top: 10px;
+    padding: 12px 24px;
+    border-radius: 12px;
+    border: none;
+    background: var(--green);
+    color: white;
+    font-size: 1rem;
+    font-family: 'Fredoka', sans-serif;
+    cursor: pointer;
+    transition: transform 0.15s;
+  }
+
+  .custom-area button:hover { transform: scale(1.05); }
+
+  .tip-box {
+    background: rgba(255, 137, 6, 0.08);
+    border: 1px solid rgba(255, 137, 6, 0.2);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 24px;
+    font-size: 0.88rem;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+
+  .tip-box strong { color: var(--accent); }
+
+  footer {
+    text-align: center;
+    padding: 30px 0;
+    color: var(--muted);
+    font-size: 0.8rem;
+  }
+
+  @media (max-width: 500px) {
+    .word-grid { grid-template-columns: 1fr; }
+    .input-row { flex-direction: column; }
+    header h1 { font-size: 1.5rem; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- ✅ 苹果用户安装提示 -->
+  <div class="install-banner" id="installBanner">
+    <button class="close-btn" onclick="document.getElementById('installBanner').style.display='none'">✕</button>
+    📲 <strong>苹果用户安装方法：</strong><br>
+    点击Safari底部的 <strong>分享按钮 □↑</strong> → 选择 <strong>"添加到主屏幕"</strong> → 点添加 ✅
+  </div>
+
+  <header>
+    <h1>📚 MiMo英语发音课堂</h1>
+    <p>点击任何单词或句子就能听到标准发音</p>
+  </header>
+
+  <div class="tip-box">
+    <strong>使用方法：</strong>点击卡片听发音，跟着大声读出来。<br>
+    <strong>语速调节：</strong>刚开始可以用慢速，熟练后调快。<br>
+    <strong>练习秘诀：</strong>听一遍 → 暂停 → 大声模仿 → 再听对比
+  </div>
+
+  <div class="input-area">
+    <label>✏️ 输入任何英文单词或句子，点击发音</label>
+    <div class="input-row">
+      <input type="text" id="customInput" placeholder="输入英文..." onkeydown="if(event.key==='Enter')speakCustom()">
+      <button onclick="speakCustom()">🔊 发音</button>
+    </div>
+    <div class="speed-control">
+      <span>🐢 慢</span>
+      <input type="range" id="speedRange" min="0.4" max="1.2" step="0.1" value="0.8">
+      <span>🐇 快</span>
+      <span id="speedLabel" style="color:var(--accent);font-weight:700;">0.8x</span>
+    </div>
+  </div>
+
+  <div class="lesson-section">
+    <h2>🔤 第1课：动物单词</h2>
+    <div class="word-grid">
+      <div class="word-card" onclick="speak(this.dataset.word)" data-word="cat">
+        <div class="play-icon">▶</div>
+        <div class="english">cat</div>
+        <div class="phonetic">/kæt/</div>
+        <div class="chinese">猫</div>
+      </div>
+      <div class="word-card" onclick="speak(this.dataset.word)" data-word="dog">
+        <div class="play-icon">▶</div>
+        <div class="english">dog</div>
+        <div class="phonetic">/dɒɡ/</div>
+        <div class="chinese">狗</div>
+      </div>
+      <div class="word-card" onclick="speak(this.dataset.word)" data-word="bird">
+        <div class="play-icon">▶</div>
+        <div class="english">bird</div>
+        <div class="phonetic">/bɜːrd/</div>
+        <div class="chinese">鸟</div>
+      </div>
+      <div class="word-card" onclick="speak(this.dataset.word)" data-word="fish">
+        <div class="play-icon">▶</div>
+        <div class="english">fish</div>
+        <div class="phonetic">/fɪʃ/</div>
+        <div class="chinese">鱼</div>
+      </div>
+      <div class="word-card" onclick="speak(this.dataset.word)" data-word="rabbit">
+        <div class="play-icon">▶</div>
+        <div class="english">rabbit</div>
+        <div class="phonetic">/ˈræbɪt/</div>
+        <div class="chinese">兔子</div>
+      </div>
+      <div class="word-card" onclick="speak(this.dataset.word)" data-word="monkey">
+        <div class="play-icon">▶</div>
+        <div class="english">monkey</div>
+        <div class="phonetic">/ˈmʌŋki/</div>
+        <div class="chinese">猴子</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="lesson-section">
+    <h2>💬 第1课：简单句子</h2>
+    <div class="sentence-card" onclick="speak(this.dataset.word)" data-word="I have a cat.">
+      <div class="eng">I have a cat.</div>
+      <div class="chn">我有一只猫。</div>
+      <div class="speak-hint">▶ 点击听发音</div>
+    </div>
+    <div class="sentence-card" onclick="speak(this.dataset.word)" data-word="The dog is big.">
+      <div class="eng">The dog is big.</div>
+      <div class="chn">这只狗很大。</div>
+      <div class="speak-hint">▶ 点击听发音</div>
+    </div>
+    <div class="sentence-card" onclick="speak(this.dataset.word)" data-word="I like fish.">
+      <div class="eng">I like fish.</div>
+      <div class="chn">我喜欢鱼。</div>
+      <div class="speak-hint">▶ 点击听发音</div>
+    </div>
+  </div>
+
+  <div class="custom-area">
+    <h3>📝 把我发给你的英文内容粘贴到这里听发音</h3>
+    <textarea id="lessonText" placeholder="上课时我会把英文内容发给你，你粘贴到这里，点击按钮就能听..."></textarea>
+    <button onclick="speakLesson()">🔊 朗读这段内容</button>
+  </div>
+
+  <footer>
+    MiMo英语小课堂 · 每天进步一点点
+  </footer>
+</div>
+
+<script>
+  // ✅ 注册 Service Worker（让App离线可用）
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js').then(() => {
+      console.log('Service Worker 注册成功');
+    });
+  }
+
+  // ✅ 苹果用户检测，显示安装提示
+  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  const isStandalone = window.navigator.standalone;
+  if (isIOS && !isStandalone) {
+    document.getElementById('installBanner').classList.add('show');
+  }
+
+  const speedRange = document.getElementById('speedRange');
+  const speedLabel = document.getElementById('speedLabel');
+
+  speedRange.addEventListener('input', () => {
+    speedLabel.textContent = speedRange.value + 'x';
+  });
+
+  function speak(text) {
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = 'en-US';
+    u.rate = parseFloat(speedRange.value);
+    u.pitch = 1;
+
+    const voices = window.speechSynthesis.getVoices();
+    const enVoice = voices.find(v => v.lang.startsWith('en') && v.name.includes('Google'))
+      || voices.find(v => v.lang.startsWith('en-US'))
+      || voices.find(v => v.lang.startsWith('en'));
+    if (enVoice) u.voice = enVoice;
+
+    window.speechSynthesis.speak(u);
+  }
+
+  function speakCustom() {
+    const text = document.getElementById('customInput').value.trim();
+    if (text) speak(text);
+  }
+
+  function speakLesson() {
+    const text = document.getElementById('lessonText').value.trim();
+    if (text) speak(text);
+  }
+
+  if ('speechSynthesis' in window) {
+    window.speechSynthesis.getVoices();
+    window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
+  }
+</script>
+</body>
+</html>
