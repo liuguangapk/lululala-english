@@ -195,8 +195,56 @@ speedRange.addEventListener('input',function(){speedLabel.textContent=speedRange
 function splitSentences(text){var p=text.match(/[^.!?,;。！？；\n]+[.!?,;。！？;]?\s*/g);if(!p)return[text.trim()];return p.map(function(s){return s.trim()}).filter(function(s){return s.length>0})}
 function isChinese(text){return /[\u4e00-\u9fff]/.test(text)}
 
-function speak(text,forceLang){window.speechSynthesis.cancel();isPaused=false;updateBadge('playing');var sentences=splitSentences(text);var lang=forceLang||(isChinese(text)?'zh-CN':'en-US');speakQueue(sentences,lang,0)}
-function speakQueue(sentences,lang,index){if(index>=sentences.length){updateBadge('done');return}var u=new SpeechSynthesisUtterance(sentences[index]);u.lang=lang;u.rate=parseFloat(speedRange.value);u.pitch=1.05;u.volume=1;if(selectedVoice){var voices=window.speechSynthesis.getVoices();var m=voices.find(function(v){return v.voiceURI===selectedVoice.voiceURI&&v.lang.startsWith(lang.substring(0,2))});if(m)u.voice=m;else{var f=voices.find(function(v){return v.lang.startsWith(lang.substring(0,2))});if(f)u.voice=f}}u.onend=function(){if(!isPaused)setTimeout(function(){speakQueue(sentences,lang,index+1)},200)};u.onerror=function(){updateBadge('done')};window.speechSynthesis.speak(u)}
+// ===== 设置朗读声音 =====
+function setVoice(u,lang){
+  if(selectedVoice){
+    var voices=window.speechSynthesis.getVoices();
+    var m=voices.find(function(v){return v.voiceURI===selectedVoice.voiceURI&&v.lang.startsWith(lang.substring(0,2))});
+    if(m)u.voice=m;else{var f=voices.find(function(v){return v.lang.startsWith(lang.substring(0,2))});if(f)u.voice=f}
+  }
+}
+
+// ===== 单语言朗读（用在朗读原文、朗读翻译按钮）=====
+function speak(text,forceLang){
+  window.speechSynthesis.cancel();isPaused=false;updateBadge('playing');
+  var sentences=splitSentences(text);var lang=forceLang||(isChinese(text)?'zh-CN':'en-US');
+  speakQueue(sentences,lang,0);
+}
+function speakQueue(sentences,lang,index){
+  if(index>=sentences.length){updateBadge('done');return}
+  var u=new SpeechSynthesisUtterance(sentences[index]);
+  u.lang=lang;u.rate=parseFloat(speedRange.value);u.pitch=1.05;u.volume=1;
+  setVoice(u,lang);
+  u.onend=function(){if(!isPaused)setTimeout(function(){speakQueue(sentences,lang,index+1)},200)};
+  u.onerror=function(){updateBadge('done')};
+  window.speechSynthesis.speak(u);
+}
+
+// ===== 双语言连续朗读（先读原文再读翻译）=====
+function speakBoth(text1,lang1,text2,lang2){
+  window.speechSynthesis.cancel();isPaused=false;updateBadge('playing');
+  var parts=[];
+  splitSentences(text1).forEach(function(s){parts.push({text:s,lang:lang1})});
+  splitSentences(text2).forEach(function(s){parts.push({text:s,lang:lang2})});
+  speakBothQueue(parts,0);
+}
+function speakBothQueue(parts,index){
+  if(index>=parts.length){updateBadge('done');return}
+  var u=new SpeechSynthesisUtterance(parts[index].text);
+  u.lang=parts[index].lang;u.rate=parseFloat(speedRange.value);u.pitch=1.05;u.volume=1;
+  setVoice(u,parts[index].lang);
+  u.onend=function(){
+    if(!isPaused){
+      // 语言切换时停顿长一点
+      var nextLang=parts[index+1]?parts[index+1].lang:'';
+      var delay=nextLang&&nextLang!==parts[index].lang?500:200;
+      setTimeout(function(){speakBothQueue(parts,index+1)},delay);
+    }
+  };
+  u.onerror=function(){updateBadge('done')};
+  window.speechSynthesis.speak(u);
+}
+
 function stopSpeak(){window.speechSynthesis.cancel();isPaused=false;updateBadge('done')}
 function updateBadge(s){var el=document.getElementById('badge_main');if(s==='playing'){el.textContent='正在朗读...';el.className='play-badge show playing'}else{el.className='play-badge'}}
 
@@ -223,18 +271,22 @@ function showResult(el,fl,ft,tl,tt,s1,s2,uid){
     '</div>';
 }
 
-// ===== 顶部输入框 =====
+// ===== 顶部输入框：朗读+翻译（先读原文再读翻译）=====
 async function speakAndTranslate(){
   var t=document.getElementById('customInput').value.trim();if(!t)return;
-  var cn=isChinese(t);speak(t,cn?'zh-CN':'en-US');
+  var cn=isChinese(t);
   var el=document.getElementById('quickResult');el.classList.add('show');
   el.innerHTML='<div class="content" style="color:var(--accent)">正在翻译...</div>';
-  var c=await translateText(t,cn?'zh|en':'en|zh');
-  if(cn)showResult(el,'中文原文',t,'英文翻译',c,'zh-CN','en-US','q');
-  else showResult(el,'英文原文',t,'中文翻译',c,'en-US','zh-CN','q');
+  var translated=await translateText(t,cn?'zh|en':'en|zh');
+  var fromLang=cn?'zh-CN':'en-US';
+  var toLang=cn?'en-US':'zh-CN';
+  if(cn)showResult(el,'中文原文',t,'英文翻译',translated,fromLang,toLang,'q');
+  else showResult(el,'英文原文',t,'中文翻译',translated,fromLang,toLang,'q');
+  // 先读原文，再读翻译
+  speakBoth(t,fromLang,translated,toLang);
 }
 
-// ===== 粘贴区（只翻译 + 朗读+翻译，没有只朗读）=====
+// ===== 粘贴区 =====
 async function translateLesson(){
   var t=document.getElementById('lessonText').value.trim();if(!t)return;
   var el=document.getElementById('lessonResult');el.classList.add('show');
@@ -243,14 +295,19 @@ async function translateLesson(){
   if(cn)showResult(el,'中文原文',t,'英文翻译',tr,'zh-CN','en-US','l');
   else showResult(el,'英文原文',t,'中文翻译',tr,'en-US','zh-CN','l');
 }
+
 async function speakAndTranslateLesson(){
   var t=document.getElementById('lessonText').value.trim();if(!t)return;
-  var cn=isChinese(t);speak(t,cn?'zh-CN':'en-US');
+  var cn=isChinese(t);
   var el=document.getElementById('lessonResult');el.classList.add('show');
   el.innerHTML='<div class="content" style="color:var(--accent)">正在翻译...</div>';
-  var tr=await translateText(t,cn?'zh|en':'en|zh');
-  if(cn)showResult(el,'中文原文',t,'英文翻译',tr,'zh-CN','en-US','l');
-  else showResult(el,'英文原文',t,'中文翻译',tr,'en-US','zh-CN','l');
+  var translated=await translateText(t,cn?'zh|en':'en|zh');
+  var fromLang=cn?'zh-CN':'en-US';
+  var toLang=cn?'en-US':'zh-CN';
+  if(cn)showResult(el,'中文原文',t,'英文翻译',translated,fromLang,toLang,'l');
+  else showResult(el,'英文原文',t,'中文翻译',translated,fromLang,toLang,'l');
+  // 先读原文，再读翻译
+  speakBoth(t,fromLang,translated,toLang);
 }
 
 // ===== 语音输入 =====
@@ -260,7 +317,6 @@ function switchLang(lang){var btnEn=document.getElementById('btnEn');var btnZh=d
 function startRecording(){var SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR){document.getElementById('micStatus').textContent='浏览器不支持语音，请用Safari或Chrome';return}isRecording=true;var micBtn=document.getElementById('micBtn');var ms=document.getElementById('micStatus');var isZh=voiceLang==='zh-CN';micBtn.className='mic-btn '+(isZh?'recording-zh':'recording');micBtn.textContent='🔴';ms.textContent=isZh?'正在听...请说中文':'正在听...请说英文';ms.className='mic-status listening';recognition=new SR();recognition.lang=voiceLang;recognition.continuous=false;recognition.interimResults=true;recognition.maxAlternatives=1;var gotFinal=false;recognition.onresult=function(e){var interim='';for(var i=0;i<e.results.length;i++){if(e.results[i].isFinal){var text=e.results[i][0].transcript.trim();gotFinal=true;ms.textContent='✅ 识别到：'+text;ms.className='mic-status done';stopRecording();handleVoiceResult(text);return}else{interim+=e.results[i][0].transcript}}if(interim)ms.textContent='正在听：'+interim};recognition.onerror=function(e){if(e.error==='not-allowed')ms.textContent='请允许麦克风权限';else if(e.error==='no-speech')ms.textContent='没有听到声音，请再试一次';else if(e.error==='aborted')return;else ms.textContent='识别出错，请重试';ms.className='mic-status';stopRecording()};recognition.onend=function(){if(isRecording&&!gotFinal){stopRecording();ms.textContent='没有识别到内容，请重试';ms.className='mic-status'}};try{recognition.start()}catch(e){stopRecording()}}
 function stopRecording(){isRecording=false;var micBtn=document.getElementById('micBtn');micBtn.className='mic-btn';micBtn.textContent='🎤';try{if(recognition)recognition.stop()}catch(e){}recognition=null}
 
-// ===== 语音识别结果处理（中文模式只朗读英文翻译）=====
 async function handleVoiceResult(text){
   var cn=voiceLang==='zh-CN';
   var el=document.getElementById('voiceResult');
@@ -272,18 +328,15 @@ async function handleVoiceResult(text){
   var toLabel=cn?'英文翻译':'中文翻译';
   var translated=await translateText(text,voiceLangPair);
   showResult(el,fromLabel,text,toLabel,translated,fromLang,toLang,'v');
-
-  // 英文模式：朗读英文原文  中文模式：只朗读英文翻译
+  // 英文模式：朗读英文原文；中文模式：只朗读英文翻译
   if(cn){speak(translated,'en-US')}
   else{speak(text,'en-US')}
-
-  var ms=document.getElementById('micStatus');
-  ms.textContent='✅ 翻译完成';ms.className='mic-status done';
+  var ms=document.getElementById('micStatus');ms.textContent='✅ 翻译完成';ms.className='mic-status done';
 }
 
 document.getElementById('micBtn').addEventListener('click',function(e){e.preventDefault();if(isRecording)stopRecording();else startRecording()});
 
-// ===== 拍照OCR（不自动朗读，只显示结果+按钮）=====
+// ===== 拍照OCR =====
 function getFileFromEvent(){var c=document.getElementById('cameraInput'),g=document.getElementById('galleryInput');if(c.files.length>0)return c.files[0];if(g.files.length>0)return g.files[0];return null}
 function compressImage(file,cb){var r=new FileReader();r.onload=function(e){var img=new Image();img.onload=function(){var cv=document.createElement('canvas');var mw=1500,w=img.width,h=img.height;if(w>mw){h=Math.round(h*mw/w);w=mw}cv.width=w;cv.height=h;cv.getContext('2d').drawImage(img,0,0,w,h);cv.toBlob(function(b){cb(b)},'image/jpeg',0.85)};img.src=e.target.result};r.readAsDataURL(file)}
 async function ocrFetch(blob,lang){var fd=new FormData();fd.append('file',blob,'photo.jpg');fd.append('language',lang);fd.append('isOverlayRequired','false');fd.append('OCREngine','2');var res=await fetch('https://api.ocr.space/parse/image',{method:'POST',headers:{'apikey':'K85037192388957'},body:fd});return await res.json()}
@@ -295,7 +348,6 @@ async function processPhoto(){
   preview.innerHTML='<img src="'+URL.createObjectURL(file)+'" alt="">';preview.classList.add('show');
   rb.style.display='block';pb.classList.add('show');pf.style.width='10%';pt.textContent='正在压缩图片...';
   result.classList.remove('show');result.innerHTML='';err.classList.remove('show');err.innerHTML='';
-
   compressImage(file,async function(blob){
     pf.style.width='25%';pt.textContent='正在同时识别中英文...';
     try{
@@ -314,12 +366,9 @@ async function processPhoto(){
       var clean=finalText.replace(/\r\n+/g,' ').replace(/\n+/g,' ').trim();
       var tr=await translateText(clean,isCh?'zh|en':'en|zh');
       pf.style.width='100%';pt.textContent='完成！';setTimeout(function(){pb.classList.remove('show')},800);
-
-      // 只显示结果，不自动朗读
       if(isCh)showResult(result,'识别到的中文（自动）',finalText,'英文翻译',tr,'zh-CN','en-US','o');
       else showResult(result,'识别到的英文（自动）',finalText,'中文翻译',tr,'en-US','zh-CN','o');
-      // 不调用 speak()
-
+      // 不自动朗读
     }catch(e){pb.classList.remove('show');err.textContent='识别出错：'+e.message;err.classList.add('show')}
   });
 }
