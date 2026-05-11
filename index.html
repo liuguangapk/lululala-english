@@ -372,123 +372,104 @@ async function speakAndTranslateLesson(){
   else showResult(el,'英文原文',t,'中文翻译',tr,'en-US','zh-CN','l');
 }
 
-// ===== 语音输入（双引擎：同时识别中英文）=====
-var recogEn=null,recogZh=null;
+// ===== 语音输入（先听英文，没结果自动换中文）=====
+var currentRecog=null;
 var isRecording=false;
-var resultFound=false;
+var finalText='';
 
 function startRecording(){
   var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-  if(!SR){var ms=document.getElementById('micStatus');ms.textContent='你的浏览器不支持语音输入，请用Chrome或Safari';ms.className='mic-status';return}
-
+  if(!SR){
+    document.getElementById('micStatus').textContent='浏览器不支持语音输入，请用Safari或Chrome';
+    return;
+  }
+  if(isRecording)return;
   isRecording=true;
-  resultFound=false;
+  finalText='';
   var micBtn=document.getElementById('micBtn');
-  var ms=document.getElementById('micStatus');
   micBtn.classList.add('recording');
   micBtn.textContent='🔴';
-  ms.textContent='正在听...请说话（自动识别中英文）';
-  ms.className='mic-status listening';
-
-  // 英文引擎
-  recogEn=new SR();
-  recogEn.lang='en-US';
-  recogEn.continuous=true;
-  recogEn.interimResults=true;
-  recogEn.maxAlternatives=1;
-
-  recogEn.onresult=function(e){
-    if(resultFound)return;
-    var final='',interim='';
-    for(var i=0;i<e.results.length;i++){
-      if(e.results[i].isFinal)final+=e.results[i][0].transcript;
-      else interim+=e.results[i][0].transcript;
-    }
-    var show=final+interim;
-    if(show)ms.textContent='听到英文：'+show;
-    if(final.trim()&&!isChinese(final)){
-      resultFound=true;
-      stopBothRecog();
-      ms.textContent='✅ 识别到英文：'+final.trim();
-      ms.className='mic-status done';
-      handleVoiceResult(final.trim());
-    }
-  };
-  recogEn.onerror=function(e){
-    if(resultFound)return;
-    if(e.error==='not-allowed'){ms.textContent='请允许麦克风权限';ms.className='mic-status'}
-  };
-  recogEn.onend=function(){
-    if(isRecording&&!resultFound){
-      // 英文引擎结束但没结果，等中文引擎
-    }
-  };
-
-  // 中文引擎
-  recogZh=new SR();
-  recogZh.lang='zh-CN';
-  recogZh.continuous=true;
-  recogZh.interimResults=true;
-  recogZh.maxAlternatives=1;
-
-  recogZh.onresult=function(e){
-    if(resultFound)return;
-    var final='',interim='';
-    for(var i=0;i<e.results.length;i++){
-      if(e.results[i].isFinal)final+=e.results[i][0].transcript;
-      else interim+=e.results[i][0].transcript;
-    }
-    var show=final+interim;
-    if(show){
-      if(isChinese(show))ms.textContent='听到中文：'+show;
-      else ms.textContent='听到：'+show;
-    }
-    if(final.trim()){
-      if(isChinese(final)){
-        // 是中文，直接用
-        resultFound=true;
-        stopBothRecog();
-        ms.textContent='✅ 识别到中文：'+final.trim();
-        ms.className='mic-status done';
-        handleVoiceResult(final.trim());
-      }
-      // 如果不是中文（英文被zh引擎误识别），忽略，等en引擎
-    }
-  };
-  recogZh.onerror=function(e){
-    if(resultFound)return;
-    if(e.error==='not-allowed'){ms.textContent='请允许麦克风权限';ms.className='mic-status'}
-  };
-  recogZh.onend=function(){
-    if(isRecording&&!resultFound){
-      setTimeout(function(){
-        if(!resultFound){
-          ms.textContent='没有听到内容，请重试';
-          ms.className='mic-status';
-          isRecording=false;
-          micBtn.classList.remove('recording');
-          micBtn.textContent='🎤';
-        }
-      },500);
-    }
-  };
-
-  try{recogEn.start()}catch(e){}
-  try{recogZh.start()}catch(e){}
+  document.getElementById('micStatus').textContent='正在听...请说话';
+  document.getElementById('micStatus').className='mic-status listening';
+  tryLang('en-US');
 }
 
-function stopBothRecog(){
-  try{if(recogEn)recogEn.stop()}catch(e){}
-  try{if(recogZh)recogZh.stop()}catch(e){}
+function tryLang(lang){
+  var ms=document.getElementById('micStatus');
+  var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  currentRecog=new SR();
+  currentRecog.lang=lang;
+  currentRecog.continuous=false;
+  currentRecog.interimResults=true;
+  currentRecog.maxAlternatives=1;
+
+  currentRecog.onresult=function(e){
+    var final='',interim='';
+    for(var i=0;i<e.results.length;i++){
+      if(e.results[i].isFinal)final+=e.results[i][0].transcript;
+      else interim+=e.results[i][0].transcript;
+    }
+    finalText=final||interim;
+    if(finalText){
+      var cn=isChinese(finalText);
+      ms.textContent=(cn?'听到中文：':'听到英文：')+finalText;
+    }
+  };
+
+  currentRecog.onerror=function(e){
+    if(e.error==='not-allowed'){
+      ms.textContent='请允许麦克风权限后重试';
+      ms.className='mic-status';
+      resetMicBtn();
+      isRecording=false;
+    } else if(e.error==='no-speech'&&lang==='en-US'){
+      ms.textContent='切换中文模式...🇨🇳';
+      tryLang('zh-CN');
+    } else {
+      resetMicBtn();
+      isRecording=false;
+    }
+  };
+
+  currentRecog.onend=function(){
+    if(!isRecording)return;
+    if(finalText.trim()){
+      // 有结果，处理
+      resetMicBtn();
+      isRecording=false;
+      ms.textContent='识别完成，正在翻译...';
+      ms.className='mic-status done';
+      handleVoiceResult(finalText.trim());
+    } else if(lang==='en-US'){
+      // 英文没听到，换中文
+      ms.textContent='切换中文模式...🇨🇳';
+      tryLang('zh-CN');
+    } else {
+      // 中文也没听到
+      ms.textContent='没有听到内容，请重试';
+      ms.className='mic-status';
+      resetMicBtn();
+      isRecording=false;
+    }
+  };
+
+  try{currentRecog.start();}catch(e){
+    resetMicBtn();
+    isRecording=false;
+  }
+}
+
+function resetMicBtn(){
+  var micBtn=document.getElementById('micBtn');
+  micBtn.classList.remove('recording');
+  micBtn.textContent='🎤';
 }
 
 function stopRecording(shouldProcess){
   if(!isRecording)return;
   isRecording=false;
-  var micBtn=document.getElementById('micBtn');
-  micBtn.classList.remove('recording');
-  micBtn.textContent='🎤';
-  stopBothRecog();
+  resetMicBtn();
+  try{if(currentRecog)currentRecog.stop();}catch(e){}
 }
 
 async function handleVoiceResult(text){
