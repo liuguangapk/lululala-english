@@ -35,10 +35,7 @@
     background:linear-gradient(135deg,var(--accent),var(--accent2));
     -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
   }
-  .voice-inline{
-    display:flex;align-items:center;justify-content:center;
-    gap:10px;margin-top:14px;flex-wrap:wrap;
-  }
+  .voice-inline{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:14px;flex-wrap:wrap}
   .voice-inline label{font-size:.8rem;color:var(--muted);font-weight:700;white-space:nowrap}
   .voice-select{
     padding:9px 30px 9px 12px;border-radius:10px;
@@ -49,10 +46,7 @@
     background-repeat:no-repeat;background-position:right 10px center;
   }
   .voice-select:focus{border-color:var(--blue)}
-  .section-box{
-    background:var(--card);border-radius:16px;padding:20px;
-    margin-bottom:20px;border:1px solid rgba(255,255,255,.06);
-  }
+  .section-box{background:var(--card);border-radius:16px;padding:20px;margin-bottom:20px;border:1px solid rgba(255,255,255,.06)}
   .section-box label{display:block;font-size:.85rem;color:var(--muted);margin-bottom:8px;font-weight:700}
   .input-row{display:flex;gap:10px}
   .input-row input{
@@ -71,60 +65,55 @@
   .btn-primary:active{transform:scale(.97)}
   .speed-control{display:flex;align-items:center;gap:12px;margin-top:14px;font-size:.85rem;color:var(--muted)}
   .speed-control input[type="range"]{flex:1;accent-color:var(--accent)}
-  .translate-result{
-    margin-top:16px;background:rgba(44,182,125,.08);
-    border:1px solid rgba(44,182,125,.2);border-radius:12px;padding:16px;display:none;
-  }
+  .translate-result{margin-top:16px;background:rgba(44,182,125,.08);border:1px solid rgba(44,182,125,.2);border-radius:12px;padding:16px;display:none}
   .translate-result .label{font-size:.8rem;color:var(--green);font-weight:700;margin-bottom:8px}
   .translate-result .content{font-size:1.05rem;color:var(--text);line-height:1.8}
   .translate-result.show{display:block}
   .btn-row{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;align-items:center}
-  .btn-green{
-    padding:12px 16px;border-radius:12px;border:none;background:var(--green);
-    color:#fff;font-size:.88rem;font-family:'Fredoka',sans-serif;cursor:pointer;transition:transform .15s;
-  }
+  .btn-green{padding:12px 16px;border-radius:12px;border:none;background:var(--green);color:#fff;font-size:.88rem;font-family:'Fredoka',sans-serif;cursor:pointer;transition:transform .15s}
   .btn-green:hover{transform:scale(1.05)}
-  .btn-orange{
-    padding:12px 16px;border-radius:12px;border:none;background:var(--accent);
-    color:#fff;font-size:.88rem;font-family:'Fredoka',sans-serif;cursor:pointer;transition:transform .15s;
-  }
+  .btn-orange{padding:12px 16px;border-radius:12px;border:none;background:var(--accent);color:#fff;font-size:.88rem;font-family:'Fredoka',sans-serif;cursor:pointer;transition:transform .15s}
   .btn-orange:hover{transform:scale(1.05)}
-  .btn-gradient{
-    padding:12px 16px;border-radius:12px;border:none;
-    background:linear-gradient(135deg,var(--green),var(--accent));
-    color:#fff;font-size:.88rem;font-family:'Fredoka',sans-serif;cursor:pointer;transition:transform .15s;
-  }
+  .btn-gradient{padding:12px 16px;border-radius:12px;border:none;background:linear-gradient(135deg,var(--green),var(--accent));color:#fff;font-size:.88rem;font-family:'Fredoka',sans-serif;cursor:pointer;transition:transform .15s}
   .btn-gradient:hover{transform:scale(1.05)}
-  .ctrl-sm{
-    width:38px;height:38px;border-radius:50%;border:none;
-    display:inline-flex;align-items:center;justify-content:center;
-    font-size:1rem;cursor:pointer;transition:all .2s;flex-shrink:0;
-  }
+  .ctrl-sm{width:38px;height:38px;border-radius:50%;border:none;display:inline-flex;align-items:center;justify-content:center;font-size:1rem;cursor:pointer;transition:all .2s;flex-shrink:0}
   .ctrl-sm:active{transform:scale(.9)}
   .ctrl-stop{background:var(--accent2);color:#fff}
   .ctrl-stop:hover{box-shadow:0 3px 12px rgba(229,49,112,.4)}
   .ctrl-clear{background:var(--muted);color:var(--bg)}
-  .ctrl-clear:hover{background:#b0adb8;box-shadow:0 3px 12px rgba(148,161,178,.3)}
-  .play-badge{
-    display:none;align-items:center;gap:6px;
-    padding:5px 10px;border-radius:20px;font-size:.72rem;font-weight:700;
-  }
+  .ctrl-clear:hover{background:#b0adb8}
+  .play-badge{display:none;align-items:center;gap:6px;padding:5px 10px;border-radius:20px;font-size:.72rem;font-weight:700}
   .play-badge.show{display:inline-flex}
   .play-badge.playing{background:rgba(44,182,125,.15);color:var(--green)}
 
+  /* ===== 语言切换 ===== */
+  .lang-toggle{
+    display:flex;background:var(--surface);border-radius:12px;padding:4px;margin-bottom:16px;
+  }
+  .lang-toggle-btn{
+    flex:1;padding:12px 8px;border:none;border-radius:10px;
+    font-size:.95rem;font-family:'Fredoka',sans-serif;cursor:pointer;
+    transition:all .25s;background:transparent;color:var(--muted);font-weight:600;
+  }
+  .lang-toggle-btn.active-en{background:linear-gradient(135deg,var(--blue),var(--green));color:#fff;box-shadow:0 3px 12px rgba(61,169,252,.3)}
+  .lang-toggle-btn.active-zh{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;box-shadow:0 3px 12px rgba(255,137,6,.3)}
+
+  /* ===== 麦克风 ===== */
   .voice-input-area{text-align:center;padding:10px 0 0}
   .mic-btn{
     width:80px;height:80px;border-radius:50%;border:none;
     background:linear-gradient(135deg,var(--blue),var(--green));
-    color:#fff;font-size:2rem;cursor:pointer;
-    transition:all .2s;
+    color:#fff;font-size:2rem;cursor:pointer;transition:all .2s;
     box-shadow:0 4px 20px rgba(61,169,252,.3);
     -webkit-user-select:none;user-select:none;touch-action:none;
   }
-  .mic-btn:hover{transform:scale(1.08);box-shadow:0 6px 28px rgba(61,169,252,.45)}
+  .mic-btn:hover{transform:scale(1.08)}
   .mic-btn.recording{
     background:linear-gradient(135deg,var(--accent2),var(--accent));
-    box-shadow:0 0 0 0 rgba(229,49,112,.5);
+    animation:micPulse 1s ease infinite;
+  }
+  .mic-btn.recording-zh{
+    background:linear-gradient(135deg,var(--accent),var(--accent2));
     animation:micPulse 1s ease infinite;
   }
   @keyframes micPulse{
@@ -154,11 +143,7 @@
   .progress-track{width:100%;height:8px;background:var(--surface);border-radius:4px;overflow:hidden;margin-top:8px}
   .progress-fill{height:100%;background:linear-gradient(90deg,var(--blue),var(--green));border-radius:4px;transition:width .3s;width:0%}
   .progress-text{font-size:.85rem;color:var(--blue);margin-bottom:4px}
-  .btn-retake{
-    padding:10px 20px;border-radius:12px;border:2px solid var(--surface);
-    background:transparent;color:var(--muted);font-size:.9rem;
-    font-family:'Fredoka',sans-serif;cursor:pointer;transition:all .2s;
-  }
+  .btn-retake{padding:10px 20px;border-radius:12px;border:2px solid var(--surface);background:transparent;color:var(--muted);font-size:.9rem;font-family:'Fredoka',sans-serif;cursor:pointer;transition:all .2s}
   .btn-retake:hover{border-color:var(--accent2);color:var(--accent2)}
   footer{text-align:center;padding:30px 0;color:var(--muted);font-size:.8rem}
   .error-msg{color:var(--accent2);background:rgba(229,49,112,.08);border:1px solid rgba(229,49,112,.2);border-radius:12px;padding:14px;margin-top:10px;font-size:.9rem;display:none}
@@ -186,10 +171,15 @@
 
   <!-- 语音输入 -->
   <div class="section-box">
-    <h3 style="font-family:'Fredoka',sans-serif;font-size:1rem;color:var(--blue);margin-bottom:12px">🎙 长按说话，松开自动翻译朗读</h3>
+    <h3 style="font-family:'Fredoka',sans-serif;font-size:1rem;color:var(--blue);margin-bottom:14px">🎙 语音输入</h3>
+    <!-- 语言切换 -->
+    <div class="lang-toggle">
+      <button class="lang-toggle-btn active-en" id="btnEn" onclick="switchLang('en')">🇺🇸 说英文 → 翻译中文</button>
+      <button class="lang-toggle-btn" id="btnZh" onclick="switchLang('zh')">🇨🇳 说中文 → 翻译英文</button>
+    </div>
     <div class="voice-input-area">
       <button class="mic-btn" id="micBtn">🎤</button>
-      <div class="mic-hint">说英文 → 自动翻译成中文并朗读<br>说中文 → 自动翻译成英文并朗读</div>
+      <div class="mic-hint" id="micHint">当前：说英文，自动翻译成中文并朗读</div>
       <div class="mic-status" id="micStatus"></div>
     </div>
     <div id="voiceResult" class="translate-result"></div>
@@ -256,6 +246,7 @@
 var isPaused=false;
 var selectedVoice=null;
 
+// ===== 声音加载 =====
 function loadVoices(){
   var voices=window.speechSynthesis.getVoices();
   var sel=document.getElementById('voiceSelect');sel.innerHTML='';
@@ -308,28 +299,14 @@ function speakQueue(sentences,lang,index){
   window.speechSynthesis.speak(u);
 }
 function stopSpeak(){window.speechSynthesis.cancel();isPaused=false;updateBadge('done')}
-function updateBadge(status){
-  var el=document.getElementById('badge_main');
-  if(status==='playing'){el.textContent='正在朗读...';el.className='play-badge show playing'}
-  else{el.className='play-badge'}
-}
+function updateBadge(s){var el=document.getElementById('badge_main');if(s==='playing'){el.textContent='正在朗读...';el.className='play-badge show playing'}else{el.className='play-badge'}}
 
 function clearQuick(){stopSpeak();document.getElementById('customInput').value='';var el=document.getElementById('quickResult');el.classList.remove('show');el.innerHTML=''}
-function clearPhoto(){
-  stopSpeak();
-  document.getElementById('photoPreview').classList.remove('show');document.getElementById('photoPreview').innerHTML='';
-  document.getElementById('progressBar').classList.remove('show');
-  document.getElementById('ocrResult').classList.remove('show');document.getElementById('ocrResult').innerHTML='';
-  document.getElementById('ocrError').classList.remove('show');document.getElementById('ocrError').innerHTML='';
-  document.getElementById('retakeBtn').style.display='none';
-  document.getElementById('cameraInput').value='';document.getElementById('galleryInput').value='';
-}
+function clearPhoto(){stopSpeak();document.getElementById('photoPreview').classList.remove('show');document.getElementById('photoPreview').innerHTML='';document.getElementById('progressBar').classList.remove('show');document.getElementById('ocrResult').classList.remove('show');document.getElementById('ocrResult').innerHTML='';document.getElementById('ocrError').classList.remove('show');document.getElementById('ocrError').innerHTML='';document.getElementById('retakeBtn').style.display='none';document.getElementById('cameraInput').value='';document.getElementById('galleryInput').value=''}
 function clearLesson(){stopSpeak();document.getElementById('lessonText').value='';var el=document.getElementById('lessonResult');el.classList.remove('show');el.innerHTML=''}
 function clearVoice(){stopSpeak();var el=document.getElementById('voiceResult');el.classList.remove('show');el.innerHTML='';document.getElementById('micStatus').textContent=''}
 
-async function translateChunk(text,lp){
-  try{var res=await fetch('https://api.mymemory.translated.net/get?q='+encodeURIComponent(text)+'&langpair='+(lp||'en|zh'));var data=await res.json();return data.responseData?data.responseData.translatedText:'翻译失败'}catch(e){return'翻译暂时不可用，请检查网络'}
-}
+async function translateChunk(text,lp){try{var res=await fetch('https://api.mymemory.translated.net/get?q='+encodeURIComponent(text)+'&langpair='+(lp||'en|zh'));var data=await res.json();return data.responseData?data.responseData.translatedText:'翻译失败'}catch(e){return'翻译暂时不可用，请检查网络'}}
 async function translateText(text,lp){
   if(text.length<=450)return await translateChunk(text,lp);
   var s=text.split(/(?<=[.!?\u3002\uff01\uff1f\n])\s*/);var r='',b='';
@@ -338,9 +315,9 @@ async function translateText(text,lp){
 }
 
 function showResult(el,fl,ft,tl,tt,s1,s2,uid){
-  var clearFn='clearLesson';if(uid==='q')clearFn='clearQuick';if(uid==='o')clearFn='clearPhoto';if(uid==='v')clearFn='clearVoice';
+  var cf='clearLesson';if(uid==='q')cf='clearQuick';if(uid==='o')cf='clearPhoto';if(uid==='v')cf='clearVoice';
   el.classList.add('show');
-  el.innerHTML='<div class="label">'+fl+'</div><div class="content" id="'+uid+'_r1">'+ft+'</div><div class="label" style="margin-top:12px">'+tl+'</div><div class="content" id="'+uid+'_r2">'+tt+'</div><div class="btn-row" style="margin-top:12px"><button class="btn-green" onclick="speak(document.getElementById(\''+uid+'_r1\').textContent,\''+s1+'\')">朗读原文</button><button class="btn-green" onclick="speak(document.getElementById(\''+uid+'_r2\').textContent,\''+s2+'\')">朗读翻译</button><button class="ctrl-sm ctrl-stop" onclick="stopSpeak()" title="停止朗读">⏹</button><button class="ctrl-sm ctrl-clear" onclick="'+clearFn+'()" title="一键清除">✕</button></div>';
+  el.innerHTML='<div class="label">'+fl+'</div><div class="content" id="'+uid+'_r1">'+ft+'</div><div class="label" style="margin-top:12px">'+tl+'</div><div class="content" id="'+uid+'_r2">'+tt+'</div><div class="btn-row" style="margin-top:12px"><button class="btn-green" onclick="speak(document.getElementById(\''+uid+'_r1\').textContent,\''+s1+'\')">朗读原文</button><button class="btn-green" onclick="speak(document.getElementById(\''+uid+'_r2\').textContent,\''+s2+'\')">朗读翻译</button><button class="ctrl-sm ctrl-stop" onclick="stopSpeak()">⏹</button><button class="ctrl-sm ctrl-clear" onclick="'+cf+'()">✕</button></div>';
 }
 
 async function speakAndTranslate(){
@@ -372,119 +349,116 @@ async function speakAndTranslateLesson(){
   else showResult(el,'英文原文',t,'中文翻译',tr,'en-US','zh-CN','l');
 }
 
-// ===== 语音输入（先听英文，没结果自动换中文）=====
-var currentRecog=null;
+// ===== 语音输入（单引擎切换）=====
+var voiceLang='en-US';     // 默认英文
+var voiceLangPair='en|zh'; // 翻译方向
+var recognition=null;
 var isRecording=false;
-var finalText='';
+
+function switchLang(lang){
+  var btnEn=document.getElementById('btnEn');
+  var btnZh=document.getElementById('btnZh');
+  var hint=document.getElementById('micHint');
+  var ms=document.getElementById('micStatus');
+  if(isRecording)stopRecording();
+
+  if(lang==='en'){
+    voiceLang='en-US';
+    voiceLangPair='en|zh';
+    btnEn.className='lang-toggle-btn active-en';
+    btnZh.className='lang-toggle-btn';
+    hint.textContent='当前：说英文，自动翻译成中文并朗读';
+  }else{
+    voiceLang='zh-CN';
+    voiceLangPair='zh|en';
+    btnEn.className='lang-toggle-btn';
+    btnZh.className='lang-toggle-btn active-zh';
+    hint.textContent='当前：说中文，自动翻译成英文并朗读';
+  }
+  ms.textContent='';
+}
 
 function startRecording(){
   var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-  if(!SR){
-    document.getElementById('micStatus').textContent='浏览器不支持语音输入，请用Safari或Chrome';
-    return;
-  }
-  if(isRecording)return;
+  if(!SR){var ms=document.getElementById('micStatus');ms.textContent='浏览器不支持语音，请用Safari或Chrome';ms.className='mic-status';return}
+
   isRecording=true;
-  finalText='';
   var micBtn=document.getElementById('micBtn');
-  micBtn.classList.add('recording');
-  micBtn.textContent='🔴';
-  document.getElementById('micStatus').textContent='正在听...请说话';
-  document.getElementById('micStatus').className='mic-status listening';
-  tryLang('en-US');
-}
-
-function tryLang(lang){
   var ms=document.getElementById('micStatus');
-  var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-  currentRecog=new SR();
-  currentRecog.lang=lang;
-  currentRecog.continuous=false;
-  currentRecog.interimResults=true;
-  currentRecog.maxAlternatives=1;
+  var isZhMode=voiceLang==='zh-CN';
 
-  currentRecog.onresult=function(e){
-    var final='',interim='';
+  micBtn.className='mic-btn '+(isZhMode?'recording-zh':'recording');
+  micBtn.textContent='🔴';
+  ms.textContent=isZhMode?'正在听...请说中文':'正在听...请说英文';
+  ms.className='mic-status listening';
+
+  recognition=new SR();
+  recognition.lang=voiceLang;
+  recognition.continuous=false;
+  recognition.interimResults=true;
+  recognition.maxAlternatives=1;
+
+  var gotFinal=false;
+
+  recognition.onresult=function(e){
+    var interim='';
     for(var i=0;i<e.results.length;i++){
-      if(e.results[i].isFinal)final+=e.results[i][0].transcript;
-      else interim+=e.results[i][0].transcript;
+      if(e.results[i].isFinal){
+        var text=e.results[i][0].transcript.trim();
+        gotFinal=true;
+        ms.textContent='✅ 识别到：'+text;
+        ms.className='mic-status done';
+        stopRecording();
+        handleVoiceResult(text);
+        return;
+      }else{
+        interim+=e.results[i][0].transcript;
+      }
     }
-    finalText=final||interim;
-    if(finalText){
-      var cn=isChinese(finalText);
-      ms.textContent=(cn?'听到中文：':'听到英文：')+finalText;
-    }
+    if(interim)ms.textContent='正在听：'+interim;
   };
 
-  currentRecog.onerror=function(e){
-    if(e.error==='not-allowed'){
-      ms.textContent='请允许麦克风权限后重试';
+  recognition.onerror=function(e){
+    if(e.error==='not-allowed'){ms.textContent='请允许麦克风权限';}
+    else if(e.error==='no-speech'){ms.textContent='没有听到声音，请再试一次';}
+    else if(e.error==='aborted'){return;}
+    else{ms.textContent='识别出错，请重试';}
+    ms.className='mic-status';
+    stopRecording();
+  };
+
+  recognition.onend=function(){
+    if(isRecording&&!gotFinal){
+      stopRecording();
+      ms.textContent='没有识别到内容，请重试';
       ms.className='mic-status';
-      resetMicBtn();
-      isRecording=false;
-    } else if(e.error==='no-speech'&&lang==='en-US'){
-      ms.textContent='切换中文模式...🇨🇳';
-      tryLang('zh-CN');
-    } else {
-      resetMicBtn();
-      isRecording=false;
     }
   };
 
-  currentRecog.onend=function(){
-    if(!isRecording)return;
-    if(finalText.trim()){
-      // 有结果，处理
-      resetMicBtn();
-      isRecording=false;
-      ms.textContent='识别完成，正在翻译...';
-      ms.className='mic-status done';
-      handleVoiceResult(finalText.trim());
-    } else if(lang==='en-US'){
-      // 英文没听到，换中文
-      ms.textContent='切换中文模式...🇨🇳';
-      tryLang('zh-CN');
-    } else {
-      // 中文也没听到
-      ms.textContent='没有听到内容，请重试';
-      ms.className='mic-status';
-      resetMicBtn();
-      isRecording=false;
-    }
-  };
-
-  try{currentRecog.start();}catch(e){
-    resetMicBtn();
-    isRecording=false;
-  }
+  try{recognition.start();}catch(e){stopRecording()}
 }
 
-function resetMicBtn(){
-  var micBtn=document.getElementById('micBtn');
-  micBtn.classList.remove('recording');
-  micBtn.textContent='🎤';
-}
-
-function stopRecording(shouldProcess){
-  if(!isRecording)return;
+function stopRecording(){
   isRecording=false;
-  resetMicBtn();
-  try{if(currentRecog)currentRecog.stop();}catch(e){}
+  var micBtn=document.getElementById('micBtn');
+  micBtn.className='mic-btn';
+  micBtn.textContent='🎤';
+  try{if(recognition)recognition.stop();}catch(e){}
+  recognition=null;
 }
 
 async function handleVoiceResult(text){
-  var cn=isChinese(text);
+  var cn=voiceLang==='zh-CN';
   var el=document.getElementById('voiceResult');
   el.classList.add('show');
   el.innerHTML='<div class="content" style="color:var(--accent)">正在翻译...</div>';
 
-  var lp=cn?'zh|en':'en|zh';
   var fromLang=cn?'zh-CN':'en-US';
   var toLang=cn?'en-US':'zh-CN';
   var fromLabel=cn?'识别到的中文':'识别到的英文';
   var toLabel=cn?'英文翻译':'中文翻译';
 
-  var translated=await translateText(text,lp);
+  var translated=await translateText(text,voiceLangPair);
   showResult(el,fromLabel,text,toLabel,translated,fromLang,toLang,'v');
   speak(text,fromLang);
 
@@ -493,35 +467,13 @@ async function handleVoiceResult(text){
   ms.className='mic-status done';
 }
 
-// 麦克风按钮事件
+// 麦克风按钮（Safari兼容：只用click事件）
 var micBtn=document.getElementById('micBtn');
-var holdTimer=null;
-var isHolding=false;
-
-function onStart(e){
+micBtn.addEventListener('click',function(e){
   e.preventDefault();
-  isHolding=false;
-  holdTimer=setTimeout(function(){isHolding=true;startRecording()},200);
-}
-
-function onEnd(e){
-  e.preventDefault();
-  if(holdTimer){clearTimeout(holdTimer);holdTimer=null}
-  if(isHolding){
-    isHolding=false;
-    if(isRecording)stopRecording(true);
-  }else{
-    if(isRecording)stopRecording(true);
-    else startRecording();
-  }
-}
-
-micBtn.addEventListener('mousedown',onStart);
-micBtn.addEventListener('mouseup',onEnd);
-micBtn.addEventListener('mouseleave',function(e){if(isRecording)stopRecording(true);if(holdTimer){clearTimeout(holdTimer);holdTimer=null}});
-micBtn.addEventListener('touchstart',onStart,{passive:false});
-micBtn.addEventListener('touchend',onEnd,{passive:false});
-micBtn.addEventListener('touchcancel',function(e){if(isRecording)stopRecording(true);if(holdTimer){clearTimeout(holdTimer);holdTimer=null}});
+  if(isRecording)stopRecording();
+  else startRecording();
+});
 
 // ===== 拍照OCR =====
 function getFileFromEvent(){var c=document.getElementById('cameraInput'),g=document.getElementById('galleryInput');if(c.files.length>0)return c.files[0];if(g.files.length>0)return g.files[0];return null}
