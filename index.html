@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="LuluLala">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0f0e17">
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23e53170'/><text x='50' y='68' text-anchor='middle' font-size='50' font-family='Arial'>L</text></svg>">
+<title>LuluLala</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Noto+Sans+SC:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0f0e17;--card:#1a1929;--accent:#ff8906;--accent2:#e53170;--green:#2cb67d;--blue:#3da9fc;--text:#fffffe;--muted:#94a1b2;--surface:#232246;--safe-top:env(safe-area-inset-top);--safe-bottom:env(safe-area-inset-bottom);--border-subtle:rgba(255,255,255,.06)}
+body.light{--bg:#f8f7f4;--card:#ffffff;--text:#1a1a1a;--muted:#6b7280;--surface:#e8e6e1;--border-subtle:rgba(0,0,0,.08)}
+body{font-family:'Noto Sans SC',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:12px 16px;padding-top:calc(12px + var(--safe-top));padding-bottom:calc(12px + var(--safe-bottom));-webkit-text-size-adjust:100%;transition:background .3s,color .3s}
+.container{max-width:700px;margin:0 auto}
+header{text-align:center;padding:10px 0 8px}
+header .title-row{display:flex;align-items:center;justify-content:center;gap:10px}
+header h1{font-family:'Fredoka',sans-serif;font-size:1.8rem;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1.3}
+.theme-btn{width:38px;height:38px;border-radius:50%;border:2px solid var(--border-subtle);background:var(--card);color:var(--text);font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .3s;flex-shrink:0}
+.header-controls{background:var(--card);border-radius:12px;padding:10px 16px;margin-top:8px;border:1px solid var(--border-subtle);transition:background .3s}
+.speed-row{display:flex;align-items:center;gap:8px;font-size:.75rem;color:var(--muted)}
+.speed-row label{font-weight:700;white-space:nowrap}
+.speed-row input[type="range"]{flex:1;accent-color:var(--accent)}
+.speed-val{color:var(--accent);font-weight:700;min-width:28px;text-align:right}
+.section-box{background:var(--card);border-radius:14px;padding:14px 16px;margin-bottom:12px;border:1px solid var(--border-subtle);transition:background .3s}
+.translate-result{margin-top:10px;background:rgba(44,182,125,.08);border:1px solid rgba(44,182,125,.2);border-radius:10px;padding:12px;display:none;overflow:hidden;word-break:break-word;overflow-wrap:break-word}
+.translate-result .label{font-size:.75rem;color:var(--green);font-weight:700;margin-bottom:6px}
+.translate-result .content{font-size:1rem;color:var(--text);line-height:1.7;word-break:break-word;overflow-wrap:break-word}
+.translate-result.show{display:block}
+.btn-row{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;align-items:center}
+.btn-green{padding:10px 14px;border-radius:10px;border:none;background:var(--green);color:#fff;font-size:.82rem;font-family:'Fredoka',sans-serif;cursor:pointer}
+.btn-orange{padding:10px 14px;border-radius:10px;border:none;background:var(--accent);color:#fff;font-size:.82rem;font-family:'Fredoka',sans-serif;cursor:pointer}
+.btn-gradient{padding:10px 14px;border-radius:10px;border:none;background:linear-gradient(135deg,var(--green),var(--accent));color:#fff;font-size:.82rem;font-family:'Fredoka',sans-serif;cursor:pointer}
+.ctrl-sm{width:34px;height:34px;border-radius:50%;border:none;display:inline-flex;align-items:center;justify-content:center;font-size:.9rem;cursor:pointer;flex-shrink:0}
+.ctrl-stop{background:var(--accent2);color:#fff}
+.ctrl-clear{background:var(--muted);color:var(--bg)}
+.play-badge{display:none;align-items:center;gap:6px;padding:4px 10px;border-radius:20px;font-size:.7rem;font-weight:700}
+.play-badge.show{display:inline-flex}
+.play-badge.playing{background:rgba(44,182,125,.15);color:var(--green)}
+.lang-toggle{display:flex;background:var(--surface);border-radius:10px;padding:3px;margin-bottom:10px}
+.lang-toggle-btn{flex:1;padding:10px 4px;border:none;border-radius:8px;font-size:.78rem;font-family:'Fredoka',sans-serif;cursor:pointer;transition:all .25s;background:transparent;color:var(--muted);font-weight:600;white-space:nowrap}
+.lang-toggle-btn.active-blue{background:linear-gradient(135deg,var(--blue),var(--green));color:#fff}
+.lang-toggle-btn.active-orange{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff}
+.lang-toggle-btn.active-purple{background:linear-gradient(135deg,#8b5cf6,var(--accent2));color:#fff}
+.dual-btn-area{display:flex;justify-content:center;gap:20px;padding:12px 0 0}
+.mic-btn{width:88px;height:88px;border-radius:50%;border:none;color:#fff;cursor:pointer;transition:transform .15s,box-shadow .15s;-webkit-user-select:none;user-select:none;touch-action:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px}
+.mic-btn .mic-icon{font-size:1.6rem;line-height:1}
+.mic-btn .mic-label{font-size:.58rem;font-family:'Fredoka',sans-serif;font-weight:600;opacity:.9}
+.btn-hold{background:linear-gradient(135deg,var(--blue),var(--green));box-shadow:0 4px 20px rgba(61,169,252,.3)}
+.btn-hold.pressing{transform:scale(1.15);box-shadow:0 0 0 8px rgba(61,169,252,.2),0 4px 30px rgba(61,169,252,.5)}
+.btn-record{background:linear-gradient(135deg,var(--accent),var(--accent2));box-shadow:0 4px 20px rgba(229,49,112,.3)}
+.btn-record.recording{transform:scale(1.15);animation:recPulse 1.5s ease infinite}
+@keyframes recPulse{0%,100%{box-shadow:0 0 0 8px rgba(229,49,112,.1),0 4px 20px rgba(229,49,112,.3)}50%{box-shadow:0 0 0 14px rgba(229,49,112,.05),0 4px 30px rgba(229,49,112,.5)}}
+.toggle-row{display:flex;justify-content:center;gap:16px;margin-top:10px}
+.toggle-item{display:flex;align-items:center;gap:6px;font-size:.75rem;color:var(--muted);cursor:pointer;-webkit-user-select:none;user-select:none}
+.toggle-switch{width:36px;height:20px;border-radius:10px;background:var(--surface);position:relative;transition:background .25s;flex-shrink:0}
+.toggle-switch.on{background:var(--green)}
+.toggle-switch::after{content:'';position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;transition:transform .25s}
+.toggle-switch.on::after{transform:translateX(16px)}
+.mic-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;z-index:999;pointer-events:none}
+.mic-overlay.show{display:block}
+.mic-toast{position:absolute;top:15%;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.88);color:#fff;padding:18px 28px;border-radius:16px;text-align:center;min-width:160px;backdrop-filter:blur(10px);pointer-events:none}
+.mic-toast .icon{font-size:2.2rem;margin-bottom:6px}
+.mic-toast .wave{display:flex;justify-content:center;gap:3px;height:22px;align-items:center;margin:6px 0}
+.mic-toast .wave span{width:3px;background:var(--green);border-radius:2px;animation:waveBar .8s ease infinite}
+.mic-toast .wave span:nth-child(1){height:8px;animation-delay:0s}
+.mic-toast .wave span:nth-child(2){height:16px;animation-delay:.1s}
+.mic-toast .wave span:nth-child(3){height:22px;animation-delay:.2s}
+.mic-toast .wave span:nth-child(4){height:16px;animation-delay:.3s}
+.mic-toast .wave span:nth-child(5){height:8px;animation-delay:.4s}
+.mic-toast .text{font-size:.9rem;font-family:'Fredoka',sans-serif;margin-bottom:3px}
+.mic-toast .sub{font-size:.75rem;color:rgba(255,255,255,.6)}
+.mic-toast .time{font-size:.7rem;color:rgba(255,255,255,.4);margin-top:6px}
+@keyframes waveBar{0%,100%{transform:scaleY(.4)}50%{transform:scaleY(1)}}
+.mic-status{font-size:.8rem;color:var(--blue);margin-top:8px;min-height:20px;font-weight:700;text-align:center}
+.mic-status.done{color:var(--green)}
+.photo-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.btn-photo{padding:14px 8px;border-radius:10px;border:2px dashed var(--blue);background:rgba(61,169,252,.08);color:var(--blue);font-size:.78rem;font-family:'Fredoka',sans-serif;cursor:pointer;text-align:center;line-height:1.4;transition:all .2s}
+.btn-photo:active{background:rgba(61,169,252,.2)}
+.photo-preview{display:none;margin-bottom:10px;text-align:center}
+.photo-preview img{max-width:100%;border-radius:10px;border:2px solid var(--surface)}
+.photo-preview.show{display:block}
+.progress-bar{display:none;margin-bottom:10px}
+.progress-bar.show{display:block}
+.progress-track{width:100%;height:6px;background:var(--surface);border-radius:3px;overflow:hidden;margin-top:6px}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--blue),var(--green));border-radius:3px;transition:width .3s;width:0%}
+.progress-text{font-size:.8rem;color:var(--blue);margin-bottom:4px}
+.btn-retake{padding:8px 16px;border-radius:10px;border:2px solid var(--surface);background:transparent;color:var(--muted);font-size:.82rem;font-family:'Fredoka',sans-serif;cursor:pointer}
+.error-msg{color:var(--accent2);background:rgba(229,49,112,.08);border:1px solid rgba(229,49,112,.2);border-radius:10px;padding:10px;margin-top:8px;font-size:.82rem;display:none}
+.error-msg.show{display:block}
+footer{text-align:center;padding:16px 0;color:var(--muted);font-size:.72rem}
+@media(max-width:500px){header h1{font-size:1.4rem}.section-box{padding:12px 14px}.btn-green,.btn-orange,.btn-gradient{padding:8px 12px;font-size:.78rem}.ctrl-sm{width:32px;height:32px;font-size:.85rem}.mic-btn{width:78px;height:78px}.mic-btn .mic-icon{font-size:1.4rem}.lang-toggle-btn{font-size:.72rem;padding:9px 3px}.dual-btn-area{gap:14px}.btn-photo{padding:12px 6px;font-size:.72rem}}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <div class="title-row">
+      <h1>LuluLala让快乐发声</h1>
+      <button class="theme-btn" id="themeBtn" onclick="toggleTheme()">🌙</button>
+    </div>
+    <div class="header-controls">
+      <div class="speed-row">
+        <label>语速</label>
+        <span style="font-size:.65rem">慢</span>
+        <input type="range" id="speedRange" min="0.4" max="1.2" step="0.1" value="0.85">
+        <span style="font-size:.65rem">快</span>
+        <span class="speed-val" id="speedLabel">0.85x</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="section-box">
+    <div style="font-family:'Fredoka',sans-serif;font-size:.85rem;color:var(--blue);margin-bottom:8px">🎙 语音输入</div>
+    <div class="lang-toggle">
+      <button class="lang-toggle-btn" id="btnEn" onclick="switchMode('en')">🇺🇸 说英文</button>
+      <button class="lang-toggle-btn active-orange" id="btnZh" onclick="switchMode('zh')">🇨🇳 说中文</button>
+      <button class="lang-toggle-btn" id="btnAuto" onclick="switchMode('auto')">🌐 翻译+朗读</button>
+    </div>
+    <div class="dual-btn-area">
+      <button class="mic-btn btn-hold" id="micBtnHold"><span class="mic-icon">🎤</span><span class="mic-label">按住说话</span></button>
+      <button class="mic-btn btn-record" id="micBtnRecord"><span class="mic-icon">🎙</span><span class="mic-label">录音翻译</span></button>
+    </div>
+    <div class="mic-status" id="micStatus"></div>
+    <div class="toggle-row">
+      <div class="toggle-item" onclick="toggleAutoAll()">
+        <div class="toggle-switch on" id="toggleAll"></div>
+        <span>翻译+朗读</span>
+      </div>
+    </div>
+    <div id="voiceResult" class="translate-result"></div>
+  </div>
+
+  <div class="mic-overlay" id="micOverlay">
+    <div class="mic-toast">
+      <div class="icon" id="toastIcon">🎤</div>
+      <div class="wave" id="toastWave"><span></span><span></span><span></span><span></span><span></span></div>
+      <div class="text" id="toastText">松开 结束</div>
+      <div class="sub" id="toastSub">正在录音...</div>
+      <div class="time" id="toastTime">0s</div>
+    </div>
+  </div>
+
+  <div class="section-box">
+    <div style="font-family:'Fredoka',sans-serif;font-size:.85rem;color:var(--blue);margin-bottom:8px">📷 拍照翻译</div>
+    <div class="photo-grid">
+      <label class="btn-photo">📸 拍英文翻译<input type="file" accept="image/*" capture="environment" onchange="processPhoto(this,'eng')" hidden></label>
+      <label class="btn-photo">📸 拍中文翻译<input type="file" accept="image/*" capture="environment" onchange="processPhoto(this,'chs')" hidden></label>
+      <label class="btn-photo">🖼 英文相册翻译<input type="file" accept="image/*" onchange="processPhoto(this,'eng')" hidden></label>
+      <label class="btn-photo">🖼 中文相册翻译<input type="file" accept="image/*" onchange="processPhoto(this,'chs')" hidden></label>
+    </div>
+    <div id="photoPreview" class="photo-preview"></div>
+    <div id="progressBar" class="progress-bar"><div class="progress-text" id="progressText">准备识别...</div><div class="progress-track"><div class="progress-fill" id="progressFill"></div></div></div>
+    <div id="ocrError" class="error-msg"></div>
+    <div id="ocrResult" class="translate-result"></div>
+    <div id="retakeBtn" style="display:none;text-align:center;margin-top:8px"><button class="btn-retake" onclick="clearPhoto()">重新拍照</button></div>
+  </div>
+
+  <div class="section-box">
+    <div style="font-family:'Fredoka',sans-serif;font-size:.85rem;color:var(--blue);margin-bottom:8px">📝 文字翻译</div>
+    <textarea id="lessonText" placeholder="粘贴或输入中英文" style="width:100%;padding:10px;border-radius:10px;border:2px solid var(--surface);background:var(--bg);color:var(--text);font-size:.9rem;font-family:'Fredoka',sans-serif;resize:vertical;min-height:60px;outline:none"></textarea>
+    <div class="btn-row">
+      <button class="btn-orange" onclick="translateLesson()">翻译</button>
+      <button class="btn-gradient" onclick="speakAndTranslateLesson()">翻译+朗读</button>
+      <button class="ctrl-sm ctrl-stop" onclick="stopSpeak()">⏹</button>
+      <button class="ctrl-sm ctrl-clear" onclick="clearLesson()">✕</button>
+      <span class="play-badge" id="badge_main"></span>
+    </div>
+    <div id="lessonResult" class="translate-result"></div>
+  </div>
+
+  <footer>LuluLala让快乐发声</footer>
+</div>
+
+<script>
+/* ===== 状态 ===== */
+var isPaused = false;
+var voiceActivated = false;
+var autoAll = true;
+var voiceMode = 'zh';
+var recognition = null;
+var isHoldActive = false;
+var isRecordActive = false;
+var holdTimer = null;
+var secondsTimer = null;
+var seconds = 0;
+
+var micBtnHold = document.getElementById('micBtnHold');
+var micBtnRecord = document.getElementById('micBtnRecord');
+var micOverlay = document.getElementById('micOverlay');
+
+/* ===== 主题 ===== */
+var isDark = true;
+function toggleTheme() {
+  isDark = !isDark;
+  document.body.classList.toggle('light', !isDark);
+  document.getElementById('themeBtn').textContent = isDark ? '🌙' : '☀️';
+  document.querySelector('meta[name="theme-color"]').setAttribute('content', isDark ? '#0f0e17' : '#f8f7f4');
+  localStorage.setItem('lululala-theme', isDark ? 'dark' : 'light');
+}
+(function() {
+  if (localStorage.getItem('lululala-theme') === 'light') {
+    isDark = false;
+    document.body.classList.add('light');
+    document.getElementById('themeBtn').textContent = '☀️';
+  }
+})();
+
+function toggleAutoAll() { autoAll = !autoAll; document.getElementById('toggleAll').classList.toggle('on', autoAll); }
+
+function switchMode(m) {
+  stopAllRecording();
+  voiceMode = m;
+  document.getElementById('btnEn').className = 'lang-toggle-btn' + (m === 'en' ? ' active-blue' : '');
+  document.getElementById('btnZh').className = 'lang-toggle-btn' + (m === 'zh' ? ' active-orange' : '');
+  document.getElementById('btnAuto').className = 'lang-toggle-btn' + (m === 'auto' ? ' active-purple' : '');
+  document.getElementById('micStatus').textContent = '';
+}
+
+/* ===== 音频激活 ===== */
+function silentActivateVoice() {
+  if (voiceActivated) return;
+  voiceActivated = true;
+  var u = new SpeechSynthesisUtterance(' ');
+  u.volume = 0; u.rate = 10;
+  window.speechSynthesis.speak(u);
+}
+var audioUnlocked = false;
+function unlockAudio() {
+  if (audioUnlocked) return;
+  try {
+    var AC = window.AudioContext || window.webkitAudioContext;
+    if (AC) { var ctx = new AC(); ctx.resume(); setTimeout(function() { try { ctx.close(); } catch(e) {} }, 500); }
+    audioUnlocked = true;
+  } catch(e) { audioUnlocked = true; }
+}
+
+document.getElementById('speedRange').addEventListener('input', function() { document.getElementById('speedLabel').textContent = this.value + 'x'; });
+
+/* ===== 工具 ===== */
+function isChinese(t) { return /[\u4e00-\u9fff]/.test(t); }
+
+function autoVoice(u, lang) {
+  var voices = window.speechSynthesis.getVoices();
+  var targets = lang.startsWith('en') ? ['Samantha','Karen','Daniel','Alex','Google US English'] : ['Ting-Ting','Mei-Jia','Tian-Tian','Lili','Google 普通话'];
+  var best = null;
+  for (var i = 0; i < targets.length; i++) {
+    best = voices.find(function(v) { return v.name.indexOf(targets[i]) !== -1 && v.lang.startsWith(lang.substring(0, 2)); });
+    if (best) break;
+  }
+  if (!best) best = voices.find(function(v) { return v.lang.startsWith(lang.substring(0, 2)); });
+  if (best) u.voice = best;
+}
+
+function sentenceType(t) {
+  var s = t.trim();
+  if (/[!！]$/.test(s)) return 'exclaim';
+  if (/[?？]$/.test(s) || /^(什么|怎么|为什么|Could|Would|What|Why|How|Where|When|Who|Which|Do|Does|Is|Are|Can|Will|Shall)/i.test(s)) return 'question';
+  if (/^(请|别|Let|Please|Don|Stop|Come|Go|Look|Listen|Try|Keep)/i.test(s)) return 'command';
+  return 'statement';
+}
+
+function smartSplit(text) {
+  var ms = text.match(/[^.!?,;。！？；\n]+[.!?,;。！？;]?\s*/g);
+  if (!ms) return [text.trim()];
+  var r = [];
+  ms.forEach(function(seg) {
+    seg = seg.trim(); if (!seg) return;
+    if (seg.length > 60) {
+      var p = seg.split(/(?<=[,，、;；])\s*/);
+      if (p.length > 1) {
+        var m = [], b = '';
+        p.forEach(function(x) {
+          if (b && (b + x).length > 50) { m.push(b.trim()); b = x; }
+          else { b += (b ? ' ' : '') + x; }
+        });
+        if (b.trim()) m.push(b.trim());
+        m.forEach(function(y) { if (y.trim()) r.push(y.trim()); });
+      } else { r.push(seg); }
+    } else { r.push(seg); }
+  });
+  return r;
+}
+
+function addNaturalPauses(t) {
+  return t.replace(/\s+but\s+/gi, ', but ').replace(/\s+and\s+/gi, ', and ').replace(/\s+or\s+/gi, ', or ').replace(/\s+because\s+/gi, ', because ').replace(/\s+so\s+/gi, ', so ').replace(/\s+then\s+/gi, ', then ').replace(/\s+when\s+/gi, ', when ').replace(/\s+if\s+/gi, ', if ');
+}
+
+function getSmartParams(text, pos, total) {
+  var type = sentenceType(text), br = parseFloat(document.getElementById('speedRange').value), rate, pitch;
+  switch(type) {
+    case 'question': rate = br * 0.92; pitch = 1.15; break;
+    case 'exclaim': rate = br * 0.95; pitch = 1.1; break;
+    case 'command': rate = br * 0.88; pitch = 1.05; break;
+    default: rate = br; pitch = 1;
+  }
+  if (pos === 0) rate *= 0.9;
+  if (pos === total - 1) rate *= 0.93;
+  if (text.length < 15) rate *= 0.9;
+  return { rate: Math.max(0.5, Math.min(1.8, rate)), pitch: pitch };
+}
+
+function getPauseTime(text, next, pos, total) {
+  var bp = 200;
+  if (/[.!?。！？]$/.test(text.trim())) bp = 500;
+  else if (/[,，;；、]$/.test(text.trim())) bp = 300;
+  if (next && isChinese(text) !== isChinese(next)) bp += 400;
+  if (pos === total - 1) bp = 0;
+  return bp;
+}
+
+/* ===== 朗读 ===== */
+function speak(text, fl) {
+  window.speechSynthesis.cancel(); isPaused = false; updateBadge('playing');
+  var lang = fl || (isChinese(text) ? 'zh-CN' : 'en-US');
+  var s = smartSplit(text).map(function(x) { return addNaturalPauses(x); });
+  speakSmart(s, lang, 0);
+}
+function speakSmart(s, lang, i) {
+  if (i >= s.length) { updateBadge('done'); return; }
+  var p = getSmartParams(s[i], i, s.length), pa = getPauseTime(s[i], s[i+1], i, s.length);
+  var u = new SpeechSynthesisUtterance(s[i]);
+  u.lang = lang; u.rate = p.rate; u.pitch = p.pitch; u.volume = 1;
+  autoVoice(u, lang);
+  u.onend = function() { if (!isPaused) setTimeout(function() { speakSmart(s, lang, i + 1); }, pa || 150); };
+  u.onerror = function() { updateBadge('done'); };
+  window.speechSynthesis.speak(u);
+}
+function speakBoth(t1, l1, t2, l2) {
+  window.speechSynthesis.cancel(); isPaused = false; updateBadge('playing');
+  var s1 = smartSplit(t1).map(function(x) { return addNaturalPauses(x); });
+  var s2 = smartSplit(t2).map(function(x) { return addNaturalPauses(x); });
+  var ap = [];
+  s1.forEach(function(s) { ap.push({text:s, lang:l1}); });
+  s2.forEach(function(s) { ap.push({text:s, lang:l2}); });
+  speakBS(ap, 0);
+}
+function speakBS(p, i) {
+  if (i >= p.length) { updateBadge('done'); return; }
+  var pr = getSmartParams(p[i].text, i, p.length);
+  var pa = getPauseTime(p[i].text, p[i+1] ? p[i+1].text : '', i, p.length);
+  if (p[i+1] && p[i].lang !== p[i+1].lang) pa += 400;
+  var u = new SpeechSynthesisUtterance(p[i].text);
+  u.lang = p[i].lang; u.rate = pr.rate; u.pitch = pr.pitch; u.volume = 1;
+  autoVoice(u, p[i].lang);
+  u.onend = function() { if (!isPaused) setTimeout(function() { speakBS(p, i + 1); }, pa || 150); };
+  u.onerror = function() { updateBadge('done'); };
+  window.speechSynthesis.speak(u);
+}
+function stopSpeak() { window.speechSynthesis.cancel(); isPaused = false; updateBadge('done'); }
+function updateBadge(s) {
+  var el = document.getElementById('badge_main');
+  if (s === 'playing') { el.textContent = '正在朗读...'; el.className = 'play-badge show playing'; }
+  else { el.className = 'play-badge'; }
+}
+
+/* ===== 清除 ===== */
+function clearLesson() { stopSpeak(); document.getElementById('lessonText').value = ''; document.getElementById('lessonResult').classList.remove('show'); document.getElementById('lessonResult').innerHTML = ''; }
+function clearVoice() { stopSpeak(); document.getElementById('voiceResult').classList.remove('show'); document.getElementById('voiceResult').innerHTML = ''; document.getElementById('micStatus').textContent = ''; }
+function clearPhoto() {
+  stopSpeak();
+  document.getElementById('photoPreview').classList.remove('show'); document.getElementById('photoPreview').innerHTML = '';
+  document.getElementById('progressBar').classList.remove('show');
+  document.getElementById('ocrResult').classList.remove('show'); document.getElementById('ocrResult').innerHTML = '';
+  document.getElementById('ocrError').classList.remove('show'); document.getElementById('ocrError').innerHTML = '';
+  document.getElementById('retakeBtn').style.display = 'none';
+  var inputs = document.querySelectorAll('.photo-grid input[type="file"]');
+  for (var i = 0; i < inputs.length; i++) inputs[i].value = '';
+}
+
+/* ===== 翻译API ===== */
+async function translateChunk(t, lp) {
+  try {
+    var r = await fetch('https://api.mymemory.translated.net/get?q=' + encodeURIComponent(t) + '&langpair=' + (lp || 'en|zh'));
+    var d = await r.json();
+    return d.responseData ? d.responseData.translatedText : '翻译失败';
+  } catch(e) { return '翻译暂时不可用'; }
+}
+async function translateText(t, lp) {
+  if (t.length <= 450) return await translateChunk(t, lp);
+  var s = t.split(/(?<=[.!?\u3002\uff01\uff1f\n])\s*/);
+  var r = '', b = '';
+  for (var i = 0; i < s.length; i++) {
+    if ((b + s[i]).length > 450) { if (b) r += await translateChunk(b.trim(), lp); b = s[i]; }
+    else b += (b ? ' ' : '') + s[i];
+  }
+  if (b) r += await translateChunk(b.trim(), lp);
+  return r;
+}
+
+/* ===== 结果展示 ===== */
+function showResult(el, fl, ft, tl, tt, s1, s2, uid) {
+  var cf = 'clearLesson';
+  if (uid === 'o') cf = 'clearPhoto';
+  if (uid === 'v') cf = 'clearVoice';
+  el.classList.add('show');
+  var h = '<div class="label">' + fl + '</div><div class="content" id="' + uid + '_r1">' + ft + '</div>';
+  if (tt) h += '<div class="label" style="margin-top:8px">' + tl + '</div><div class="content" id="' + uid + '_r2">' + tt + '</div>';
+  h += '<div class="btn-row" style="margin-top:8px"><button class="btn-green" onclick="speak(document.getElementById(\'' + uid + '_r1\').textContent,\'' + s1 + '\')">朗读原文</button>';
+  if (tt) h += '<button class="btn-green" onclick="speak(document.getElementById(\'' + uid + '_r2\').textContent,\'' + s2 + '\')">朗读翻译</button>';
+  h += '<button class="ctrl-sm ctrl-stop" onclick="stopSpeak()">⏹</button><button class="ctrl-sm ctrl-clear" onclick="' + cf + '()">✕</button></div>';
+  el.innerHTML = h;
+}
+
+/* ===== 文字翻译 ===== */
+async function translateLesson() {
+  var t = document.getElementById('lessonText').value.trim(); if (!t) return;
+  var el = document.getElementById('lessonResult'); el.classList.add('show');
+  el.innerHTML = '<div class="content" style="color:var(--accent)">正在翻译...</div>';
+  var cn = isChinese(t), tr = await translateText(t, cn ? 'zh|en' : 'en|zh');
+  if (cn) showResult(el, '中文原文', t, '英文翻译', tr, 'zh-CN', 'en-US', 'l');
+  else showResult(el, '英文原文', t, '中文翻译', tr, 'en-US', 'zh-CN', 'l');
+}
+async function speakAndTranslateLesson() {
+  var t = document.getElementById('lessonText').value.trim(); if (!t) return;
+  var cn = isChinese(t), el = document.getElementById('lessonResult'); el.classList.add('show');
+  el.innerHTML = '<div class="content" style="color:var(--accent)">正在翻译...</div>';
+  var tr = await translateText(t, cn ? 'zh|en' : 'en|zh');
+  var fl = cn ? 'zh-CN' : 'en-US', tl = cn ? 'en-US' : 'zh-CN';
+  if (cn) showResult(el, '中文原文', t, '英文翻译', tr, fl, tl, 'l');
+  else showResult(el, '英文原文', t, '中文翻译', tr, fl, tl, 'l');
+  speakBoth(t, fl, tr, tl);
+}
+
+/* ===== 语音结果处理 ===== */
+function showStatus(msg) {
+  var ms = document.getElementById('micStatus');
+  ms.className = msg.indexOf('✅') === 0 ? 'mic-status done' : 'mic-status';
+  ms.textContent = msg;
+}
+
+async function handleVoiceResult(text) {
+  try {
+    var fromLang, toLang, speakLang, srcLabel, tgtLabel, lp;
+    if (voiceMode === 'en') {
+      fromLang='en-US'; toLang='zh-CN'; speakLang='zh-CN'; srcLabel='识别到的英文'; tgtLabel='中文翻译'; lp='en|zh';
+    } else if (voiceMode === 'zh') {
+      fromLang='zh-CN'; toLang='en-US'; speakLang='en-US'; srcLabel='识别到的中文'; tgtLabel='英文翻译'; lp='zh|en';
+    } else {
+      var cn = isChinese(text);
+      if (cn) { fromLang='zh-CN'; toLang='en-US'; speakLang='en-US'; srcLabel='识别到的中文'; tgtLabel='英文翻译'; lp='zh|en'; }
+      else { fromLang='en-US'; toLang='zh-CN'; speakLang='zh-CN'; srcLabel='识别到的英文'; tgtLabel='中文翻译'; lp='en|zh'; }
+    }
+    var el = document.getElementById('voiceResult'); el.classList.add('show');
+    if (voiceMode === 'auto') {
+      el.innerHTML = '<div class="content" style="color:var(--accent)">正在翻译...</div>';
+      var tr = await translateText(text, lp);
+      showResult(el, srcLabel, text, tgtLabel, tr, fromLang, toLang, 'v');
+      speak(tr, speakLang); showStatus('✅ 翻译完成');
+    } else if (!autoAll) {
+      showResult(el, srcLabel, text, '', '', fromLang, toLang, 'v');
+      showStatus('✅ 识别完成');
+    } else {
+      el.innerHTML = '<div class="content" style="color:var(--accent)">正在翻译...</div>';
+      var tr = await translateText(text, lp);
+      showResult(el, srcLabel, text, tgtLabel, tr, fromLang, toLang, 'v');
+      speak(tr, speakLang); showStatus('✅ 翻译完成');
+    }
+  } catch(e) {
+    showStatus('处理出错，请重试');
+  }
+}
+
+/* ============================================================
+   语音识别 - 两种模式用不同策略
+   按住说话：showStatus + setTimeout 读取（最可靠的原始方案）
+   录音翻译：accumulatedText 直接累加 + onend 自动重启
+   ============================================================ */
+
+function stopAllRecording() {
+  if (holdTimer) { clearTimeout(holdTimer); holdTimer = null; }
+  isHoldActive = false;
+  isRecordActive = false;
+  micBtnHold.classList.remove('pressing');
+  micBtnHold.querySelector('.mic-icon').textContent = '🎤';
+  micBtnHold.querySelector('.mic-label').textContent = '按住说话';
+  micBtnRecord.classList.remove('recording');
+  micBtnRecord.querySelector('.mic-icon').textContent = '🎙';
+  micBtnRecord.querySelector('.mic-label').textContent = '录音翻译';
+  hideToast();
+  if (recognition) { try { recognition.stop(); } catch(e) {} recognition = null; }
+}
+
+/* ---- 按住说话的识别器 ---- */
+function createHoldRecognition() {
+  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) return null;
+  var rec = new SR();
+  rec.lang = voiceMode === 'en' ? 'en-US' : 'zh-CN';
+  rec.continuous = true;
+  rec.interimResults = true;
+  rec.maxAlternatives = 1;
+  rec.onresult = function(e) {
+    var interim = '';
+    for (var i = 0; i < e.results.length; i++) {
+      if (e.results[i].isFinal) {
+        showStatus('✅ 识别到：' + e.results[i][0].transcript.trim());
+      } else {
+        interim += e.results[i][0].transcript;
+      }
+    }
+    if (interim) document.getElementById('toastSub').textContent = interim;
+  };
+  rec.onerror = function(e) {
+    if (e.error === 'not-allowed') { showStatus('请允许麦克风权限'); stopAllRecording(); }
+  };
+  rec.onend = function() {};
+  return rec;
+}
+
+/* ---- 录音翻译的识别器 ---- */
+var recordAccumulated = '';
+
+function createRecordRecognition() {
+  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) return null;
+  var rec = new SR();
+  rec.lang = voiceMode === 'en' ? 'en-US' : 'zh-CN';
+  rec.continuous = true;
+  rec.interimResults = true;
+  rec.maxAlternatives = 1;
+  rec.onresult = function(e) {
+    var interim = '';
+    for (var i = 0; i < e.results.length; i++) {
+      if (e.results[i].isFinal) {
+        recordAccumulated += e.results[i][0].transcript;
+      } else {
+        interim += e.results[i][0].transcript;
+      }
+    }
+    if (interim) {
+      document.getElementById('toastSub').textContent = interim;
+    } else if (recordAccumulated) {
+      var preview = recordAccumulated.length > 50 ? recordAccumulated.substring(0, 50) + '...' : recordAccumulated;
+      document.getElementById('toastSub').textContent = preview;
+    }
+  };
+  rec.onerror = function(e) {
+    if (e.error === 'not-allowed') { showStatus('请允许麦克风权限'); stopAllRecording(); }
+  };
+  rec.onend = function() {
+    if (isRecordActive) {
+      setTimeout(function() {
+        try {
+          recognition = createRecordRecognition();
+          recognition.start();
+        } catch(e) {}
+      }, 100);
+    }
+  };
+  return rec;
+}
+
+/* ---- 按住说话 ---- */
+micBtnHold.addEventListener('touchstart', function(e) { e.preventDefault(); unlockAudio(); silentActivateVoice(); startHold(); }, {passive:false});
+micBtnHold.addEventListener('touchmove', function(e) { e.preventDefault(); }, {passive:false});
+micBtnHold.addEventListener('touchend', function(e) { e.preventDefault(); releaseHold(); }, {passive:false});
+micBtnHold.addEventListener('touchcancel', function(e) { e.preventDefault(); stopAllRecording(); showStatus('已取消'); }, {passive:false});
+micBtnHold.addEventListener('mousedown', function(e) { e.preventDefault(); unlockAudio(); silentActivateVoice(); startHold(); });
+document.addEventListener('mouseup', function() { if (isHoldActive) releaseHold(); });
+
+function startHold() {
+  if (isRecordActive) return;
+  holdTimer = setTimeout(function() {
+    isHoldActive = true; seconds = 0;
+    micBtnHold.classList.add('pressing');
+    micBtnHold.querySelector('.mic-icon').textContent = '🔴';
+    micBtnHold.querySelector('.mic-label').textContent = '松开结束';
+    showToast('🎤', '松开 结束', '正在录音...');
+    updateSeconds();
+    recognition = createHoldRecognition();
+    if (!recognition) { isHoldActive = false; hideToast(); showStatus('浏览器不支持语音'); return; }
+    try { recognition.start(); } catch(e) { isHoldActive = false; hideToast(); showStatus('无法启动语音'); }
+  }, 150);
+}
+
+function releaseHold() {
+  if (holdTimer) { clearTimeout(holdTimer); holdTimer = null; }
+  if (!isHoldActive) return;
+  isHoldActive = false;
+  if (recognition) { try { recognition.stop(); } catch(e) {} recognition = null; }
+  micBtnHold.classList.remove('pressing');
+  micBtnHold.querySelector('.mic-icon').textContent = '🎤';
+  micBtnHold.querySelector('.mic-label').textContent = '按住说话';
+  hideToast();
+  /* 原始可靠方案：等500ms让最后一个 onresult 执行完，然后读取状态文字 */
+  showStatus('正在识别...');
+  setTimeout(function() {
+    var ms = document.getElementById('micStatus');
+    if (ms.textContent === '正在识别...' || ms.textContent === '') {
+      showStatus('没有识别到内容');
+      return;
+    }
+    if (ms.textContent.indexOf('✅ 识别到：') === 0) {
+      var text = ms.textContent.replace('✅ 识别到：', '').trim();
+      if (text) handleVoiceResult(text);
+    }
+  }, 500);
+}
+
+/* ---- 录音翻译 ---- */
+micBtnRecord.addEventListener('click', function(e) {
+  e.preventDefault(); unlockAudio(); silentActivateVoice();
+  if (isRecordActive) stopRecord(); else startRecord();
+});
+
+function startRecord() {
+  if (isHoldActive) return;
+  isRecordActive = true; seconds = 0; recordAccumulated = '';
+  micBtnRecord.classList.add('recording');
+  micBtnRecord.querySelector('.mic-icon').textContent = '🔴';
+  micBtnRecord.querySelector('.mic-label').textContent = '点我停止';
+  showToast('🎙', '录音中...', '点红色按钮停止');
+  updateSeconds();
+  recognition = createRecordRecognition();
+  if (!recognition) { isRecordActive = false; micBtnRecord.classList.remove('recording'); micBtnRecord.querySelector('.mic-icon').textContent = '🎙'; micBtnRecord.querySelector('.mic-label').textContent = '录音翻译'; hideToast(); showStatus('浏览器不支持语音'); return; }
+  try { recognition.start(); } catch(e) { isRecordActive = false; micBtnRecord.classList.remove('recording'); micBtnRecord.querySelector('.mic-icon').textContent = '🎙'; micBtnRecord.querySelector('.mic-label').textContent = '录音翻译'; hideToast(); showStatus('无法启动语音'); }
+}
+
+function stopRecord() {
+  isRecordActive = false;
+  if (recognition) { try { recognition.stop(); } catch(e) {} recognition = null; }
+  micBtnRecord.classList.remove('recording');
+  micBtnRecord.querySelector('.mic-icon').textContent = '🎙';
+  micBtnRecord.querySelector('.mic-label').textContent = '录音翻译';
+  hideToast();
+  var finalText = recordAccumulated.trim();
+  if (finalText) {
+    showStatus('✅ 识别到：' + finalText);
+    handleVoiceResult(finalText);
+  } else {
+    showStatus('没有识别到内容');
+  }
+}
+
+/* ===== 弹窗 ===== */
+function showToast(icon, text, sub) {
+  micOverlay.classList.add('show');
+  document.getElementById('toastIcon').textContent = icon;
+  document.getElementById('toastText').textContent = text;
+  document.getElementById('toastSub').textContent = sub;
+  document.getElementById('toastWave').className = 'wave';
+}
+function hideToast() { micOverlay.classList.remove('show'); clearInterval(secondsTimer); }
+function updateSeconds() {
+  var el = document.getElementById('toastTime'); el.textContent = seconds + 's';
+  secondsTimer = setInterval(function() { seconds++; el.textContent = seconds + 's'; }, 1000);
+}
+
+/* ===== 拍照翻译 ===== */
+function compressImage(file, cb) {
+  var r = new FileReader();
+  r.onload = function(e) {
+    var img = new Image();
+    img.onload = function() {
+      var cv = document.createElement('canvas');
+      var mw = 1500, w = img.width, h = img.height;
+      if (w > mw) { h = Math.round(h * mw / w); w = mw; }
+      cv.width = w; cv.height = h;
+      cv.getContext('2d').drawImage(img, 0, 0, w, h);
+      cv.toBlob(function(b) { cb(b); }, 'image/jpeg', 0.85);
+    };
+    img.src = e.target.result;
+  };
+  r.readAsDataURL(file);
+}
+async function ocrFetch(blob, lang) {
+  var fd = new FormData();
+  fd.append('file', blob, 'photo.jpg');
+  fd.append('language', lang);
+  fd.append('isOverlayRequired', 'false');
+  fd.append('OCREngine', '2');
+  var res = await fetch('https://api.ocr.space/parse/image', { method: 'POST', headers: { 'apikey': 'K85037192388957' }, body: fd });
+  return await res.json();
+}
+async function processPhoto(input, ocrLang) {
+  var file = input.files[0]; if (!file) return; input.value = '';
+  var preview = document.getElementById('photoPreview');
+  var pb = document.getElementById('progressBar');
+  var pt = document.getElementById('progressText');
+  var pf = document.getElementById('progressFill');
+  var result = document.getElementById('ocrResult');
+  var err = document.getElementById('ocrError');
+  preview.innerHTML = '<img src="' + URL.createObjectURL(file) + '" alt="">';
+  preview.classList.add('show');
+  result.classList.remove('show'); result.innerHTML = '';
+  err.classList.remove('show'); err.innerHTML = '';
+  document.getElementById('retakeBtn').style.display = 'none';
+  pb.classList.add('show'); pf.style.width = '10%'; pt.textContent = '正在压缩图片...';
+  compressImage(file, async function(blob) {
+    pf.style.width = '30%'; pt.textContent = ocrLang === 'eng' ? '正在识别英文...' : '正在识别中文...';
+    try {
+      var data = await ocrFetch(blob, ocrLang);
+      pf.style.width = '70%'; pt.textContent = '识别完成，正在翻译...';
+      var text = '';
+      if (data && !data.IsErroredOnProcessing && data.ParsedResults && data.ParsedResults[0]) {
+        text = (data.ParsedResults[0].ParsedText || '').trim();
+      }
+      if (!text) { err.textContent = '没有识别到文字，请对准重新拍照'; err.classList.add('show'); pb.classList.remove('show'); return; }
+      var clean = text.replace(/\r\n+/g, ' ').replace(/\n+/g, ' ').trim();
+      var lp, fromLang, toLang, srcLabel, tgtLabel;
+      if (ocrLang === 'eng') { lp='en|zh'; fromLang='en-US'; toLang='zh-CN'; srcLabel='识别到的英文'; tgtLabel='中文翻译'; }
+      else { lp='zh|en'; fromLang='zh-CN'; toLang='en-US'; srcLabel='识别到的中文'; tgtLabel='英文翻译'; }
+      var tr = await translateText(clean, lp);
+      pf.style.width = '100%'; pt.textContent = '完成！';
+      setTimeout(function() { pb.classList.remove('show'); }, 800);
+      showResult(result, srcLabel, clean, tgtLabel, tr, fromLang, toLang, 'o');
+      document.getElementById('retakeBtn').style.display = 'block';
+    } catch(e) { pb.classList.remove('show'); err.textContent = '识别出错：' + e.message; err.classList.add('show'); }
+  });
+}
+</script>
+</body>
+</html>
